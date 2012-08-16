@@ -1,0 +1,52 @@
+#ifndef _PELIB_C
+#define _PELIB_C
+
+int parse_pe_header(PESTRUCT *p, FILE *fp, BYTE *buf) {
+  // Get PE offset value from DOS stub
+  fseek(fp, 0x3C, SEEK_SET);
+  fgets(fbuf, 4, fp);
+
+  // PE offset
+  pe.offset = lendian(fbuf, 4);
+
+  // Get RVA of entry point
+  fseek(fp, (pe.offset + 40), SEEK_SET);
+  fgets(fbuf, 4, fp);
+
+  // RVA of entry point
+  pe.rvaep = lendian(fbuf, 4);
+  printf("EP RVA: %.8x\n", pe.rvaep);
+
+  // Get RVA of code section
+  fseek(fp, (pe.offset + 44), SEEK_SET);
+  fgets(fbuf, 4, fp);
+
+  // RVA of code section
+  pe.rvacode = lendian(fbuf, 4);
+  printf("Code section RVA: %.8x\n", pe.rvacode);
+
+  // Get RVA of data section
+  fseek(fp, (pe.offset + 48), SEEK_SET);
+  fgets(fbuf, 4, fp);
+
+  // RVA of data section
+  pe.rvadata = lendian(fbuf, 4);
+  printf("Data section RVA: %.8x\n", pe.rvadata);
+
+  // Get address of image base
+  fseek(fp, (pe.offset + 52), SEEK_SET);
+  fgets(fbuf, 4, fp);
+
+  // Address of image base
+  pe.base = lendian(fbuf, 4);
+  printf("Image base: %.8x\n", pe.base);
+
+  // Get size of code section
+  fseek(fp, (pe.offset + 28), SEEK_SET);
+  fgets(fbuf, 4, fp);
+
+  // Size of code section
+  pe.codesize = lendian(fbuf, 4);
+  printf("Size of code section: %.8x\n", pe.codesize);
+
+#endif
