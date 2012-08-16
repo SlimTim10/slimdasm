@@ -1,38 +1,47 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int lendian(unsigned char *, int);
-
-typedef unsigned long DWORD;
-typedef unsigned char BYTE;
-
-struct pestruct {
-  DWORD offset; /* Offset of PE header */
-  DWORD rvaep; /* RVA of entry point */
-  DWORD rvacode; /* RVA of code section */
-  DWORD rvadata; /* RVA of data section */
-};
+#include "defs.h"
+#include "pe.h"
+#include "utils.h"
 
 int main(void) {
   FILE *fin;
   BYTE *fbuf;
+  PESTRUCT *pe;
 
-  struct pestruct pe;
-
-  fbuf = (char *)malloc(256 * sizeof(char));
+  fbuf = (BYTE *)malloc(256 * sizeof(char));
+  pe = (PESTRUCT *)malloc(sizeof(PESTRUCT));
 
   fin = fopen("test.exe", "rb");
 
-  // Get PE offset value from DOS stub
-  fseek(fin, 0x3C, SEEK_SET);
+  parse_pe_header(pe, fin, fbuf);
+
+  printf("EP RVA: %.8x\n", pe->rvaep);
+  printf("Code section RVA: %.8x\n", pe->rvacode);
+  printf("Data section RVA: %.8x\n", pe->rvadata);
+  printf("Image base: %.8x\n", pe->base);
+  printf("Size of code section: %.8x\n", pe->codesize);
+
+  // Get size of headers
+  fseek(fin, (pe->offset + 84), SEEK_SET);
   fgets(fbuf, 4, fin);
 
-  // PE offset
-  pe.offset = lendian(fbuf, 4);
-  printf("%.8x\n", pe.offset);
+  DWORD codeoffset;
+  codeoffset = lendian(fbuf, 4);
+  printf("Code section offset: %.8x\n", codeoffset);
 
-  fseek(fin, pe.offset, SEEK_SET);
-  fgets(fbuf, 4, fin);
+  printf("\n");
+
+  // Go to start of code section
+  fseek(fin, codeoffset, SEEK_SET);
+  fgets(fbuf, 24, fin);
+  int i;
+  DWORD addr = pe->base + pe->rvacode;
+  for (i = 0; i < 24; i++) {
+    printf("%.8x\t%.2x\tINSTRUCTION\n", addr, fbuf[i]);
+    addr++;
+  }
 
   /*  while (!feof(fin)) {
     fgets(fbuf, 10, fin);
@@ -43,18 +52,4 @@ int main(void) {
   free(fbuf);
 
   return 0;
-}
-
-/* Return a 32-bit integer of the little endian value of an array of length
-count */
-int lendian(unsigned char *n, int count) {
-  int ret = 0;
-  int i, shift;
-
-  for (i = 0; i < count; i++) {
-    shift = i * 8;
-    ret |= (n[i] << shift);
-  }
-
-  return ret;
 }
