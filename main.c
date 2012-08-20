@@ -4,10 +4,14 @@
 #include "defs.h"
 #include "pe.h"
 #include "utils.h"
+#include "dasm.h"
 
 int main(void) {
+  // Global file pointer to input file for disassembly
   FILE *fin;
+  // Byte buffer for file data
   BYTE *fbuf;
+  // Information from PE header
   PESTRUCT *pe;
 
   fbuf = (BYTE *)malloc(256 * sizeof(char));
@@ -35,12 +39,21 @@ int main(void) {
 
   // Go to start of code section
   fseek(fin, codeoffset, SEEK_SET);
-  fgets(fbuf, 24, fin);
-  int i;
+
+  // Length of instruction (in bytes)
+  long int len;
+  // Address of instruction
   DWORD addr = pe->base + pe->rvacode;
+  // Assembly instruction
+  char *instr;
+  // Counter
+  int i;
   for (i = 0; i < 24; i++) {
-    printf("%.8x\t%.2x\tINSTRUCTION\n", addr, fbuf[i]);
-    addr++;
+    len = ftell(fin);
+    instr = parse_instr(fin);
+    printf("%.8x\t%s\n", addr, instr);
+    len = ftell(fin) - len;
+    addr += len;
   }
 
   /*  while (!feof(fin)) {
@@ -48,8 +61,11 @@ int main(void) {
     printf("%s", fbuf);
     }*/
 
-  fclose(fin);
   free(fbuf);
+  free(pe);
+  free(instr);
+
+  fclose(fin);
 
   return 0;
 }
