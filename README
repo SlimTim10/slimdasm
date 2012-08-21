@@ -1,4 +1,6 @@
-slimdasm is a minimal x86 disassembler. It currently works only with executables of the PE file format.
+Slimdasm is a minimal x86 disassembler.
+Currently works only with executables of the PE file format.
+Disassembly instruction output is in Intel format.
 
 Compile with GCC:
 gcc -o main.exe main.c utils.c pe.c dasm.c
