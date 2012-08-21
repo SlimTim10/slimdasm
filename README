@@ -3,4 +3,6 @@ Currently works only with executables of the PE file format.
 Disassembly instruction output is in Intel format.
 
 Compile with GCC:
-gcc -o main.exe main.c utils.c pe.c dasm.c
+gcc -o output/slimdasm.exe slimdasm.c utils.c pe.c dasm.c
+
+usage: slimdasm.exe target

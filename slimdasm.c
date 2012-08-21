@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "dasm.h"
 
-int main(void) {
+int main(int argc, char *argv[]) {
   // Global file pointer to input file for disassembly
   FILE *fin;
   // Byte buffer for file data
@@ -17,7 +17,11 @@ int main(void) {
   fbuf = (BYTE *)malloc(256 * sizeof(char));
   pe = (PESTRUCT *)malloc(sizeof(PESTRUCT));
 
-  fin = fopen("test.exe", "rb");
+  if (argc < 2) {
+    usage(argv[0]);
+  }
+
+  fin = fopen(argv[1], "rb");
 
   parse_pe_header(pe, fin, fbuf);
 
