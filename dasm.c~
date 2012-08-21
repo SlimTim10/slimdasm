@@ -1,8 +1,0 @@
-#ifndef _UTILSLIB_C
-#define _UTILSLIB_C
-
-#include "asm.h"
-
-
-
-#endif
