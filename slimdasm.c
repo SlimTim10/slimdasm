@@ -7,11 +7,8 @@
 #include "dasm.h"
 
 int main(int argc, char *argv[]) {
-  // Global file pointer to input file for disassembly
-  FILE *fin;
-  // Byte buffer for file data
+  FILE *fin;		// Global file pointer to input file for disassembly
   BYTE *fbuf;
-  // Information from PE header
   PESTRUCT *pe;
 
   fbuf = (BYTE *)malloc(256 * sizeof(char));
@@ -31,7 +28,7 @@ int main(int argc, char *argv[]) {
   printf("Image base: %.8x\n", pe->base);
   printf("Size of code section: %.8x\n", pe->codesize);
 
-  // Get size of headers
+  /* Get size of headers */
   fseek(fin, (pe->offset + 84), SEEK_SET);
   fgets(fbuf, 4, fin);
 
@@ -41,20 +38,15 @@ int main(int argc, char *argv[]) {
 
   printf("\n");
 
-  // Go to start of code section
-  fseek(fin, codeoffset, SEEK_SET);
+  fseek(fin, codeoffset, SEEK_SET);	// Go to start of code section
 
-  // Length of instruction (in bytes)
   long int len;
-  // Address of instruction
   DWORD addr = pe->base + pe->rvacode;
-  // Assembly instruction
   char *instr;
-  // Counter
   int i;
   for (i = 0; i < 24; i++) {
     len = ftell(fin);
-    instr = parse_instr(fin);
+    instr = parse_instr(fin, addr);
     printf("%.8x\t%s\n", addr, instr);
     len = ftell(fin) - len;
     addr += len;

@@ -3,22 +3,29 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
 
 #include "dasm.h"
 #include "defs.h"
 
 /* Parse assembly instruction from file stream at current position and return a pointer to the string */
-char *parse_instr(FILE *fp) {
+char *parse_instr(FILE *fp, long int curaddr) {
   BYTE b = fgetc(fp);
   BYTE mod;
   BYTE ext;
   char *ret = (char *)malloc(64 * sizeof(char));
   char *opa1 = (char *)malloc(64 * sizeof(char));
   char *opa2 = (char *)malloc(64 * sizeof(char));
-  DWORD moffs32;
+  char *tmp;
+  DWORD val32;
   int i;
 
+  ///TEST
+  printf("%x\t", b);
+
   switch(b) {
+
   case 0x50: /* 50+rd  PUSH r32 */
   case 0x51: /* 50+rd  PUSH r32 */
   case 0x52: /* 50+rd  PUSH r32 */
@@ -29,6 +36,13 @@ char *parse_instr(FILE *fp) {
   case 0x57: /* 50+rd  PUSH r32 */
     sprintf(ret, "PUSH %s", reg_table(b, 'd'));
     break;
+
+  case 0x74: /* 74 cb  JE rel8 */
+    // Get 1-byte operand for offset
+    b = fgetc(fp);
+    sprintf(ret, "JE SHORT %.8x", (b + 2 + curaddr));
+    break;
+
   case 0x83: /* 83 /d ib */
     // Get ModR/M and opcode extension
     b = fgetc(fp);
@@ -54,6 +68,22 @@ char *parse_instr(FILE *fp) {
       break;
     }
     break;
+
+  case 0x85: /* 85 /r  TEST r/m32,r32 */
+    b = fgetc(fp);
+    mod = (b & 0xC0) >> 6;
+    if (mod == 0) {
+//TODO
+    } else if (mod == 3) {
+      opa1 = reg_table(((b >> 3) & 7), 'd');
+      opa2 = reg_table((b & 7), 'd');
+    } else {
+      opa1 = "OPA1ERR";
+      opa2 = "OPA2ERR";
+    }
+    sprintf(ret, "TEST %s,%s", opa1, opa2);
+    break;
+
   case 0x89: /* 89 /r  MOV r/m32,r32 */
     b = fgetc(fp);
     mod = (b & 0xC0) >> 6;
@@ -68,18 +98,59 @@ char *parse_instr(FILE *fp) {
     }
     sprintf(ret, "MOV %s,%s", opa1, opa2);
     break;
+
   case 0xA1: /* A1  MOV EAX,moffs32* */
-    moffs32 = 0;
+    val32 = 0;
     for (i = 0; i < 4; i++) {
       b = fgetc(fp);
-      moffs32 |= (b << (i * 8));
+      val32 |= (b << (i * 8));
     }
-    sprintf(ret, "MOV EAX,DWORD PTR DS:[%x]", moffs32);
+    sprintf(ret, "MOV EAX,DWORD PTR DS:[%x]", val32);
     break;
+
+  case 0xC7: /* C7 /0  MOV r/m32,imm32 */
+    b = fgetc(fp);		// Get ModR/M and opcode extension
+    mod = (b & 0xC0) >> 6;
+    ext = (b & 0x38) >> 3;
+    if (ext == 0) {
+      if (mod == 0) {
+	b = fgetc(fp);		// Get SIB
+	tmp = sib_to_str(b);
+	sprintf(ret, "MOV DWORD PTR SS:[%s],", tmp);
+	free(tmp);
+      } else if (mod == 1) {
+	b = fgetc(fp);		// Get SIB
+	tmp = sib_to_str(b);
+	b = fgetc(fp);		// Get displacement byte (signed)
+	if (b & 0x80) {
+	  sprintf(ret, "MOV DWORD PTR SS:[%s-%x],", tmp, (BYTE)(~b) + 1);
+	} else {
+	  sprintf(ret, "MOV DWORD PTR SS:[%s+%x],", tmp, b);
+	}
+	free(tmp);
+      } else {
+//TODO
+      }
+      /* Get second operand */
+      val32 = 0;
+      for (i = 0; i < 4; i++) {
+	b = fgetc(fp);
+	val32 |= (b << (i * 8));
+      }
+      // Append to string
+      sprintf(ret + strlen(ret), "%x", val32);	
+    } else {
+      ret = "OPCERR";
+    }
+    break;
+
   default:
     ret = "OPCERR";
     break;
   }
+
+  free(opa1);
+  free(opa2);
 
   return ret;
 }
@@ -199,6 +270,31 @@ char *reg_table(BYTE b, char bwd) {
   }
 
   return reg;
+}
+
+/* Return string from given SIB (Scale-Index-Base) byte */
+/* 7 6    5 4 3  2 1 0 */
+/* Scale  Index  Base */
+/* string format: Index*2^Scale+Base */
+char *sib_to_str(BYTE sib) {
+  BYTE scale;
+  BYTE index;
+  BYTE base;
+  char *str = (char *)malloc(32 * sizeof(char));
+
+  scale = (sib & 0xC0) >> 6;
+  index = (sib & 0x38) >> 3;
+  base = (sib & 0x07);
+
+  if (index == base && base == 4) {	// Special case where Index and Base both refer to ESP
+    sprintf(str, "%s", reg_table(base, 'd'));
+  } else if (scale != 0) {
+    sprintf(str, "%s*%d+%s", reg_table(index, 'd'), (BYTE)pow(2, scale), reg_table(base, 'd'));
+  } else {
+    sprintf(str, "%s+%s", reg_table(index, 'd'), reg_table(base, 'd'));
+  }
+
+  return str;
 }
 
 #endif
