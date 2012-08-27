@@ -11,14 +11,17 @@ int main(int argc, char *argv[]) {
   BYTE *fbuf;
   PESTRUCT *pe;
 
-  fbuf = (BYTE *)malloc(256 * sizeof(char));
-  pe = (PESTRUCT *)malloc(sizeof(PESTRUCT));
+  fbuf = (BYTE *) malloc(256 * sizeof(char));
+  pe = (PESTRUCT *) malloc(sizeof(PESTRUCT));
 
   if (argc < 2) {
     usage(argv[0]);
   }
 
-  fin = fopen(argv[1], "rb");
+  if ((fin = fopen(argv[1], "rb")) == 0) {
+    fprintf(stderr, "Error: could not open file\n");
+    exit(1);
+  }
 
   parse_pe_header(pe, fin, fbuf);
 

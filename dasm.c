@@ -14,9 +14,9 @@ char *parse_instr(FILE *fp, long int curaddr) {
   BYTE b = fgetc(fp);
   BYTE mod;
   BYTE ext;
-  char *ret = (char *)malloc(64 * sizeof(char));
-  char *opa1 = (char *)malloc(64 * sizeof(char));
-  char *opa2 = (char *)malloc(64 * sizeof(char));
+  char *ret = (char *) malloc(64 * sizeof(char));
+  char *opa1 = (char *) malloc(64 * sizeof(char));
+  char *opa2 = (char *) malloc(64 * sizeof(char));
   char *tmp;
   DWORD val32;
   int i;
@@ -123,7 +123,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	tmp = sib_to_str(b);
 	b = fgetc(fp);		// Get displacement byte (signed)
 	if (b & 0x80) {
-	  sprintf(ret, "MOV DWORD PTR SS:[%s-%x],", tmp, (BYTE)(~b) + 1);
+	  sprintf(ret, "MOV DWORD PTR SS:[%s-%x],", tmp, (BYTE) ((~b) + 1));
 	} else {
 	  sprintf(ret, "MOV DWORD PTR SS:[%s+%x],", tmp, b);
 	}
@@ -280,7 +280,7 @@ char *sib_to_str(BYTE sib) {
   BYTE scale;
   BYTE index;
   BYTE base;
-  char *str = (char *)malloc(32 * sizeof(char));
+  char *str = (char *) malloc(32 * sizeof(char));
 
   scale = (sib & 0xC0) >> 6;
   index = (sib & 0x38) >> 3;
@@ -289,7 +289,7 @@ char *sib_to_str(BYTE sib) {
   if (index == base && base == 4) {	// Special case where Index and Base both refer to ESP
     sprintf(str, "%s", reg_table(base, 'd'));
   } else if (scale != 0) {
-    sprintf(str, "%s*%d+%s", reg_table(index, 'd'), (BYTE)pow(2, scale), reg_table(base, 'd'));
+    sprintf(str, "%s*%d+%s", reg_table(index, 'd'), (BYTE) pow(2, scale), reg_table(base, 'd'));
   } else {
     sprintf(str, "%s+%s", reg_table(index, 'd'), reg_table(base, 'd'));
   }
