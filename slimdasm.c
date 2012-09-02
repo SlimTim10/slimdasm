@@ -25,11 +25,11 @@ int main(int argc, char *argv[]) {
 
   parse_pe_header(pe, fin, fbuf);
 
-  printf("EP RVA: %.8x\n", pe->rvaep);
-  printf("Code section RVA: %.8x\n", pe->rvacode);
-  printf("Data section RVA: %.8x\n", pe->rvadata);
-  printf("Image base: %.8x\n", pe->base);
-  printf("Size of code section: %.8x\n", pe->codesize);
+  printf("EP RVA: %.8X\n", pe->rvaep);
+  printf("Code section RVA: %.8X\n", pe->rvacode);
+  printf("Data section RVA: %.8X\n", pe->rvadata);
+  printf("Image base: %.8X\n", pe->base);
+  printf("Size of code section: %.8X\n", pe->codesize);
 
   /* Get size of headers */
   fseek(fin, (pe->offset + 84), SEEK_SET);
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 
   DWORD codeoffset;
   codeoffset = lendian(fbuf, 4);
-  printf("Code section offset: %.8x\n", codeoffset);
+  printf("Code section offset: %.8X\n", codeoffset);
 
   printf("\n");
 
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
   for (i = 0; i < 24; i++) {
     len = ftell(fin);
     instr = parse_instr(fin, addr);
-    printf("%.8x\t%s\n", addr, instr);
+    printf("%.8X\t%s\n", addr, instr);
     len = ftell(fin) - len;
     addr += len;
   }

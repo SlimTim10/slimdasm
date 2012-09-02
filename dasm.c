@@ -22,34 +22,34 @@ char *parse_instr(FILE *fp, long int curaddr) {
   int i;
 
   ///TEST
-  printf("%x\t", b);
+  printf("%.2X\t", b);
 
-  switch(b) {
+  switch (b) {
 
-  case 0x50: /* 50+rd  PUSH r32 */
-  case 0x51: /* 50+rd  PUSH r32 */
-  case 0x52: /* 50+rd  PUSH r32 */
-  case 0x53: /* 50+rd  PUSH r32 */
-  case 0x54: /* 50+rd  PUSH r32 */
-  case 0x55: /* 50+rd  PUSH r32 */
-  case 0x56: /* 50+rd  PUSH r32 */
-  case 0x57: /* 50+rd  PUSH r32 */
+  case 0x50:	/* 50+rd  PUSH r32 */
+  case 0x51:	/* 50+rd  PUSH r32 */
+  case 0x52:	/* 50+rd  PUSH r32 */
+  case 0x53:	/* 50+rd  PUSH r32 */
+  case 0x54:	/* 50+rd  PUSH r32 */
+  case 0x55:	/* 50+rd  PUSH r32 */
+  case 0x56:	/* 50+rd  PUSH r32 */
+  case 0x57:	/* 50+rd  PUSH r32 */
     sprintf(ret, "PUSH %s", reg_table(b, 'd'));
     break;
 
-  case 0x74: /* 74 cb  JE rel8 */
+  case 0x74:	/* 74 cb  JE rel8 */
     // Get 1-byte operand for offset
     b = fgetc(fp);
-    sprintf(ret, "JE SHORT %.8x", (b + 2 + curaddr));
+    sprintf(ret, "JE SHORT %.8X", (b + 2 + curaddr));
     break;
 
-  case 0x83: /* 83 /d ib */
+  case 0x83:	/* 83 /d ib */
     // Get ModR/M and opcode extension
     b = fgetc(fp);
     mod = (b & 0xC0) >> 6;
     ext = (b & 0x38) >> 3;
-    switch(ext) {
-    case 5: /* 83 /5 ib  SUB r/m32,imm8 */
+    switch (ext) {
+    case 5:	/* 83 /5 ib  SUB r/m32,imm8 */
       if (mod == 0) {
 //TODO
       } else if (mod == 3) {
@@ -61,7 +61,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	opa1 = "OPA1ERR";
 	opa2 = "OPA2ERR";
       }
-      sprintf(ret, "SUB %s,%x", opa1, *opa2);
+      sprintf(ret, "SUB %s,%X", opa1, *opa2);
       break;
     default:
       ret = "OPCERR";
@@ -69,7 +69,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
     }
     break;
 
-  case 0x85: /* 85 /r  TEST r/m32,r32 */
+  case 0x85:	/* 85 /r  TEST r/m32,r32 */
     b = fgetc(fp);
     mod = (b & 0xC0) >> 6;
     if (mod == 0) {
@@ -84,7 +84,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
     sprintf(ret, "TEST %s,%s", opa1, opa2);
     break;
 
-  case 0x89: /* 89 /r  MOV r/m32,r32 */
+  case 0x89:	/* 89 /r  MOV r/m32,r32 */
     b = fgetc(fp);
     mod = (b & 0xC0) >> 6;
     if (mod == 0) {
@@ -99,16 +99,16 @@ char *parse_instr(FILE *fp, long int curaddr) {
     sprintf(ret, "MOV %s,%s", opa1, opa2);
     break;
 
-  case 0xA1: /* A1  MOV EAX,moffs32* */
+  case 0xA1:	/* A1  MOV EAX,moffs32* */
     val32 = 0;
     for (i = 0; i < 4; i++) {
       b = fgetc(fp);
       val32 |= (b << (i * 8));
     }
-    sprintf(ret, "MOV EAX,DWORD PTR DS:[%x]", val32);
+    sprintf(ret, "MOV EAX,DWORD PTR DS:[%X]", val32);
     break;
 
-  case 0xC7: /* C7 /0  MOV r/m32,imm32 */
+  case 0xC7:	/* C7 /0  MOV r/m32,imm32 */
     b = fgetc(fp);		// Get ModR/M and opcode extension
     mod = (b & 0xC0) >> 6;
     ext = (b & 0x38) >> 3;
@@ -123,9 +123,9 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	tmp = sib_to_str(b);
 	b = fgetc(fp);		// Get displacement byte (signed)
 	if (b & 0x80) {
-	  sprintf(ret, "MOV DWORD PTR SS:[%s-%x],", tmp, (BYTE) ((~b) + 1));
+	  sprintf(ret, "MOV DWORD PTR SS:[%s-%X],", tmp, (BYTE) ((~b) + 1));
 	} else {
-	  sprintf(ret, "MOV DWORD PTR SS:[%s+%x],", tmp, b);
+	  sprintf(ret, "MOV DWORD PTR SS:[%s+%X],", tmp, b);
 	}
 	free(tmp);
       } else {
@@ -137,10 +137,25 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	b = fgetc(fp);
 	val32 |= (b << (i * 8));
       }
-      // Append to string
-      sprintf(ret + strlen(ret), "%x", val32);	
+      sprintf(ret + strlen(ret), "%X", val32);	// Append to string
     } else {
       ret = "OPCERR";
+    }
+    break;
+
+  case 0xFF:	/* FF */
+    b = fgetc(fp);		// Get ModR/M and opcode extension
+    mod = (b & 0xC0) >> 6;
+    ext = (b & 0x38) >> 3;
+    switch (ext) {
+//TODO
+    case 2:	/* FF /2  CALL r/m32 */
+      opa1 = reg_table((b & 7), 'd');
+      sprintf(ret, "CALL %s", opa1);
+      break;
+    default:
+      ret = "OPCERR";
+      break;
     }
     break;
 
@@ -156,6 +171,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 }
 
 /* Return register corresponding to given byte and size, according to Table 3-1 */
+/* bwd: 'b' (byte), 'w' (word), 'd' (dword)
 /* Table 3-1. Register Encodings Associated with the +rb, +rw, and +rd Nomenclature
 /*   rb      rw       rd
 /* AL = 0  AX = 0  EAX = 0
@@ -173,9 +189,9 @@ char *reg_table(BYTE b, char bwd) {
 
   char *reg;
 
-  switch(bwd) {
+  switch (bwd) {
   case 'b':
-    switch(b) {
+    switch (b) {
     case 0:
       reg = "AL";
       break;
@@ -205,7 +221,7 @@ char *reg_table(BYTE b, char bwd) {
     }
     break;
   case 'w':
-    switch(b) {
+    switch (b) {
     case 0:
       reg = "AX";
       break;
@@ -235,7 +251,7 @@ char *reg_table(BYTE b, char bwd) {
     }
     break;
   case 'd':
-    switch(b) {
+    switch (b) {
     case 0:
       reg = "EAX";
       break;
