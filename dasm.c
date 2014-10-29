@@ -21,7 +21,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
   DWORD val32;
   int i;
 
-  ///TEST
+  ///TEST show first byte of instruction
   printf("%.2X\t", b);
 
   switch (b) {
