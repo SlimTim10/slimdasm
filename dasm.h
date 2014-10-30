@@ -4,6 +4,9 @@
 #include "defs.h"
 
 char *parse_instr(FILE *, long int);
+BYTE get_mod(BYTE);
+BYTE get_regop(BYTE);
+BYTE get_rm(BYTE);
 char *reg_table(BYTE, char);
 char *sib_to_str(BYTE);
 

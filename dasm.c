@@ -46,14 +46,14 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0x83:	/* 83 /d ib */
 		// Get ModR/M and opcode extension
 		b = fgetc(fp);
-		mod = (b & 0xC0) >> 6;
-		ext = (b & 0x38) >> 3;
+		mod = get_mod(b);
+		ext = get_regop(b);
 		switch (ext) {
 		case 5:	/* 83 /5 ib  SUB r/m32,imm8 */
 			if (mod == 0) {
 				//TODO
 			} else if (mod == 3) {
-				opa1 = reg_table((b & 7), 'd');
+				opa1 = reg_table(get_rm(b), 'd');
 				// Get constant argument
 				b = fgetc(fp);
 				*opa2 = b;
@@ -71,12 +71,12 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	case 0x85:	/* 85 /r  TEST r/m32,r32 */
 		b = fgetc(fp);
-		mod = (b & 0xC0) >> 6;
+		mod = get_mod(b);
 		if (mod == 0) {
 			//TODO
 		} else if (mod == 3) {
-			opa1 = reg_table(((b >> 3) & 7), 'd');
-			opa2 = reg_table((b & 7), 'd');
+			opa1 = reg_table(get_regop(b), 'd');
+			opa2 = reg_table(get_rm(b), 'd');
 		} else {
 			opa1 = "OPA1ERR";
 			opa2 = "OPA2ERR";
@@ -86,12 +86,28 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	case 0x89:	/* 89 /r  MOV r/m32,r32 */
 		b = fgetc(fp);
-		mod = (b & 0xC0) >> 6;
+		mod = get_mod(b);
 		if (mod == 0) {
 			//TODO
 		} else if (mod == 3) {
-			opa1 = reg_table(((b >> 3) & 7), 'd');
-			opa2 = reg_table((b & 7), 'd');
+			opa1 = reg_table(get_regop(b), 'd');
+			opa2 = reg_table(get_rm(b), 'd');
+		} else {
+			opa1 = "OPA1ERR";
+			opa2 = "OPA2ERR";
+		}
+		sprintf(ret, "MOV %s,%s", opa1, opa2);
+		break;
+
+	case 0x8B:	/* 8B /r	MOV r32,r/m32 */
+		b = fgetc(fp);
+		mod = get_mod(b);
+		if (mod == 0) {
+			opa1 = reg_table(get_regop(b), 'd');
+			sprintf(opa2, "DWORD PTR DS:[%s]", reg_table(get_rm(b), 'd'));
+		} else if (mod == 3) {
+			opa1 = reg_table(get_regop(b), 'd');
+			opa2 = reg_table(get_rm(b), 'd');
 		} else {
 			opa1 = "OPA1ERR";
 			opa2 = "OPA2ERR";
@@ -110,8 +126,8 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	case 0xC7:	/* C7 /0  MOV r/m32,imm32 */
 		b = fgetc(fp);		// Get ModR/M and opcode extension
-		mod = (b & 0xC0) >> 6;
-		ext = (b & 0x38) >> 3;
+		mod = get_mod(b);
+		ext = get_regop(b);
 		if (ext == 0) {
 			if (mod == 0) {
 				b = fgetc(fp);		// Get SIB
@@ -145,13 +161,26 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	case 0xFF:	/* FF */
 		b = fgetc(fp);		// Get ModR/M and opcode extension
-		mod = (b & 0xC0) >> 6;
-		ext = (b & 0x38) >> 3;
+		mod = get_mod(b);
+		ext = get_regop(b);
 		switch (ext) {
 			//TODO
 		case 2:	/* FF /2  CALL r/m32 */
-			opa1 = reg_table((b & 7), 'd');
-			sprintf(ret, "CALL %s", opa1);
+			switch(get_rm(b)) {
+			case 0:
+				//TODO
+				break;
+			case 5:
+				val32 = fgetc(fp)
+					+ (fgetc(fp) << 8)
+					+ (fgetc(fp) << 16)
+					+ (fgetc(fp) << 24);
+				sprintf(ret, "CALL DWORD PTR DS:[%X]", val32);
+				break;
+			case 6:
+				//TODO
+				break;
+			}
 			break;
 		default:
 			ret = "OPCERR";
@@ -168,6 +197,21 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	free(opa2);
 
 	return ret;
+}
+
+/* Return Mod from given ModR/M byte, according to Figure 2-1 */
+BYTE get_mod(BYTE b) {
+	return (b & 0xC0) >> 6;
+}
+
+/* Return Reg/Opcode from given ModR/M byte, according to Figure 2-1 */
+BYTE get_regop(BYTE b) {
+	return (b & 0x38) >> 3;
+}
+
+/* Return R/M from given ModR/M byte, according to Figure 2-1 */
+BYTE get_rm(BYTE b) {
+	return (b & 0x07);
 }
 
 /* Return register corresponding to given byte and size, according to Table 3-1 */
