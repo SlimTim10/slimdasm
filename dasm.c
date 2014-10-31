@@ -97,18 +97,10 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "TEST %s,%s", opa1, opa2);
 		break;
 
-	case 0x89:	/* 89 /r  MOV r/m32,r32 */
+	case 0x89:	// MOV Ev,Gv
 		b = fgetc(fp);
-		mod = get_mod(b);
-		if (mod == 0) {
-			//TODO
-		} else if (mod == 3) {
-			opa1 = reg_table(get_regop(b), 'd');
-			opa2 = reg_table(get_rm(b), 'd');
-		} else {
-			opa1 = "OPA1ERR";
-			opa2 = "OPA2ERR";
-		}
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa2 = parse_modrm(fp, b, 'G', 'd');
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
 
