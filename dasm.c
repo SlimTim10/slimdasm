@@ -26,6 +26,27 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	switch (b) {
 
+	case 0x00:	// ADD Eb,Gb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "ADD %s,%s", opa1, opa2);
+		break;
+
+	case 0x89:	// MOV Ev,Gv
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa2 = parse_modrm(fp, b, 'G', 'd');
+		sprintf(ret, "MOV %s,%s", opa1, opa2);
+		break;
+
+	case 0x8B:	// MOV Gv,Ev
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "MOV %s,%s", opa1, opa2);
+		break;
+
 	/* case 0x00:	/\* 00 /r	ADD r/m8,r8 *\/ */
 	/* 	/\* ADD Eb,Gb *\/ */
 	/* 	// Get ModR/M byte */
@@ -96,20 +117,6 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	/* 	} */
 	/* 	sprintf(ret, "TEST %s,%s", opa1, opa2); */
 	/* 	break; */
-
-	case 0x89:	// MOV Ev,Gv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		opa2 = parse_modrm(fp, b, 'G', 'd');
-		sprintf(ret, "MOV %s,%s", opa1, opa2);
-		break;
-
-	case 0x8B:	// MOV Gv,Ev
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
-		sprintf(ret, "MOV %s,%s", opa1, opa2);
-		break;
 
 	case 0xA1:	/* A1  MOV EAX,moffs32* */
 		val32 = 0;
@@ -228,7 +235,7 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 			case 3:	// Mod = 00, R/M = 011
 			case 6:	// Mod = 00, R/M = 110
 			case 7:	// Mod = 00, R/M = 111
-				sprintf(ret, "%s PTR [%s]", size, reg_table(rm, bwd));
+				sprintf(ret, "%s PTR [%s]", size, reg_table(rm, 'd'));
 				break;
 			case 4:	// Mod = 00, R/M = 100
 				// SIB byte follows
@@ -257,9 +264,9 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 				// sign-extended 8-bit displacement follows
 				b = fgetc(fp);
 				if (b & 0x80) {
-					sprintf(ret, "%s PTR [%s-%X]", size, reg_table(rm, bwd), ((~b)+1));
+					sprintf(ret, "%s PTR [%s-%X]", size, reg_table(rm, 'd'), ((~b)+1));
 				} else {
-					sprintf(ret, "%s PTR [%s+%X]", size, reg_table(rm, bwd), b);
+					sprintf(ret, "%s PTR [%s+%X]", size, reg_table(rm, 'd'), b);
 				}
 				break;
 			case 4:	// Mod = 01, R/M = 100
@@ -290,7 +297,7 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 					+ (fgetc(fp) << 8)
 					+ (fgetc(fp) << 16)
 					+ (fgetc(fp) << 24);
-				sprintf(ret, "%s PTR [%s+%X]", size, reg_table(rm, bwd), val32);
+				sprintf(ret, "%s PTR [%s+%X]", size, reg_table(rm, 'd'), val32);
 				break;
 			case 4:	// Mod = 10, R/M = 100
 				// SIB byte follows
