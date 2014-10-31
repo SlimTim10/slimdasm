@@ -8,25 +8,25 @@
 #include "defs.h"
 
 /* Return a 32-bit integer of the little endian value of an array of length
-count (max 4) */
+   count (max 4) */
 unsigned long lendian(unsigned char *n, int count) {
-  int ret = 0;
-  int i, shift;
+	int ret = 0;
+	int i, shift;
 
-  count = min(count, 4);
+	count = min(count, 4);
 
-  for (i = 0; i < count; i++) {
-    shift = i * 8;
-    ret |= (n[i] << shift);
-  }
+	for (i = 0; i < count; i++) {
+		shift = i * 8;
+		ret |= (n[i] << shift);
+	}
 
-  return ret;
+	return ret;
 }
 
 /* Print usage */
 void usage(char *prog) {
-  fprintf(stderr, "usage: %s target\n", prog);
-  exit(1);
+	fprintf(stderr, "usage: %s target\n", prog);
+	exit(1);
 }
 
 #endif
