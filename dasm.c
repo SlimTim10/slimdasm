@@ -26,6 +26,15 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	switch (b) {
 
+	/* case 0x00:	/\* 00 /r	ADD r/m8,r8 *\/ */
+	/* 	/\* ADD Eb,Gb *\/ */
+	/* 	// Get ModR/M byte */
+	/* 	b = fgetc(fp); */
+	/* 	opa1 = parse_modrm(b); */
+	/* 	sprintf(ret, "ADD", opa1); */
+	/* 	mod = get_mod(b); */
+	/* 	break; */
+
 	case 0x50:	/* 50+rd  PUSH r32 */
 	case 0x51:	/* 50+rd  PUSH r32 */
 	case 0x52:	/* 50+rd  PUSH r32 */
@@ -35,6 +44,10 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0x56:	/* 50+rd  PUSH r32 */
 	case 0x57:	/* 50+rd  PUSH r32 */
 		sprintf(ret, "PUSH %s", reg_table(b, 'd'));
+		break;
+
+	case 0x66:	/* Operand-size override */
+		//TODO
 		break;
 
 	case 0x74:	/* 74 cb  JE rel8 */
@@ -99,19 +112,26 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
 
-	case 0x8B:	/* 8B /r	MOV r32,r/m32 */
+	/* case 0x8B:	/\* 8B /r	MOV r32,r/m32 *\/ */
+	/* 	b = fgetc(fp); */
+	/* 	mod = get_mod(b); */
+	/* 	if (mod == 0) { */
+	/* 		opa1 = reg_table(get_regop(b), 'd'); */
+	/* 		sprintf(opa2, "DWORD PTR DS:[%s]", reg_table(get_rm(b), 'd')); */
+	/* 	} else if (mod == 3) { */
+	/* 		opa1 = reg_table(get_regop(b), 'd'); */
+	/* 		opa2 = reg_table(get_rm(b), 'd'); */
+	/* 	} else { */
+	/* 		opa1 = "OPA1ERR"; */
+	/* 		opa2 = "OPA2ERR"; */
+	/* 	} */
+	/* 	sprintf(ret, "MOV %s,%s", opa1, opa2); */
+	/* 	break; */
+
+	case 0x8B:	// MOV Gv,Ev
 		b = fgetc(fp);
-		mod = get_mod(b);
-		if (mod == 0) {
-			opa1 = reg_table(get_regop(b), 'd');
-			sprintf(opa2, "DWORD PTR DS:[%s]", reg_table(get_rm(b), 'd'));
-		} else if (mod == 3) {
-			opa1 = reg_table(get_regop(b), 'd');
-			opa2 = reg_table(get_rm(b), 'd');
-		} else {
-			opa1 = "OPA1ERR";
-			opa2 = "OPA2ERR";
-		}
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
 
@@ -195,6 +215,83 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	free(opa1);
 	free(opa2);
+
+	return ret;
+}
+
+/* Parse ModR/M byte and return a string of the operand, given the addressing code (A.1.1.) and operand size, according to Table 2-2 */
+char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
+	char *ret = (char *) malloc(64 * sizeof(char));
+	BYTE mod = get_mod(b);
+	BYTE regop = get_regop(b);
+	BYTE rm = get_rm(b);
+	DWORD val32;
+
+	switch (addr_code) {
+	case 'E':	// Register or memory address
+		switch (mod) {
+		case 0x00:
+			switch (rm) {
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+				sprintf(ret, "DWORD PTR DS:[%s]", reg_table(rm, bwd));
+				break;
+			case 4:	// SIB byte follows
+				b = fgetc(fp);
+				sprintf(ret, "DWORD PTR DS:[%s]", sib_to_str(b));
+				break;
+			case 5:	// 32-bit displacement follows
+				val32 = fgetc(fp)
+					+ (fgetc(fp) << 8)
+					+ (fgetc(fp) << 16)
+					+ (fgetc(fp) << 24);
+				sprintf(ret, "CALL DWORD PTR DS:[%X]", val32);
+				break;
+			case 6:
+			case 7:
+				sprintf(ret, "DWORD PTR DS:[%s]", reg_table(rm, bwd));
+				break;
+			}
+			break;
+		case 0x01:
+			switch (rm) {
+			case 0:
+			case 1:
+			case 2:
+			case 3:	// sign-extended 8-bit displacement follows
+				b = fgetc(fp);
+				if (b & 0x80) {
+					sprintf(ret, "DWORD PTR DS:[%s-%X]", reg_table(rm, bwd), ((~b)+1));
+				} else {
+					sprintf(ret, "DWORD PTR DS:[%s+%X]", reg_table(rm, bwd), b);
+				}
+				break;
+			case 4:
+				//TODO
+				break;
+			case 5:
+				//TODO
+				break;
+			case 6:
+			case 7:
+				//TODO
+				break;
+			}
+			break;
+		case 0x02:
+			//TODO
+			break;
+		case 0x03:
+			ret = reg_table(rm, bwd);
+			break;
+		}
+		break;
+	case 'G':	// Register
+		ret = reg_table(regop, bwd);
+		break;
+	}
 
 	return ret;
 }
