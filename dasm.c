@@ -112,22 +112,6 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
 
-	/* case 0x8B:	/\* 8B /r	MOV r32,r/m32 *\/ */
-	/* 	b = fgetc(fp); */
-	/* 	mod = get_mod(b); */
-	/* 	if (mod == 0) { */
-	/* 		opa1 = reg_table(get_regop(b), 'd'); */
-	/* 		sprintf(opa2, "DWORD PTR DS:[%s]", reg_table(get_rm(b), 'd')); */
-	/* 	} else if (mod == 3) { */
-	/* 		opa1 = reg_table(get_regop(b), 'd'); */
-	/* 		opa2 = reg_table(get_rm(b), 'd'); */
-	/* 	} else { */
-	/* 		opa1 = "OPA1ERR"; */
-	/* 		opa2 = "OPA2ERR"; */
-	/* 	} */
-	/* 	sprintf(ret, "MOV %s,%s", opa1, opa2); */
-	/* 	break; */
-
 	case 0x8B:	// MOV Gv,Ev
 		b = fgetc(fp);
 		opa1 = parse_modrm(fp, b, 'G', 'd');
@@ -226,41 +210,46 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 	BYTE regop = get_regop(b);
 	BYTE rm = get_rm(b);
 	DWORD val32;
+	char *tmp;
 
 	switch (addr_code) {
 	case 'E':	// Register or memory address
 		switch (mod) {
 		case 0x00:
 			switch (rm) {
-			case 0:
-			case 1:
-			case 2:
-			case 3:
+			case 0:	// Mod = 00, R/M = 000
+			case 1:	// Mod = 00, R/M = 001
+			case 2:	// Mod = 00, R/M = 010
+			case 3:	// Mod = 00, R/M = 011
+			case 6:	// Mod = 00, R/M = 110
+			case 7:	// Mod = 00, R/M = 111
 				sprintf(ret, "DWORD PTR DS:[%s]", reg_table(rm, bwd));
 				break;
-			case 4:	// SIB byte follows
+			case 4:	// Mod = 00, R/M = 100
+				// SIB byte follows
 				b = fgetc(fp);
 				sprintf(ret, "DWORD PTR DS:[%s]", sib_to_str(b));
 				break;
-			case 5:	// 32-bit displacement follows
+			case 5:	// Mod = 00, R/M = 101
+				// 32-bit displacement follows
 				val32 = fgetc(fp)
 					+ (fgetc(fp) << 8)
 					+ (fgetc(fp) << 16)
 					+ (fgetc(fp) << 24);
 				sprintf(ret, "CALL DWORD PTR DS:[%X]", val32);
 				break;
-			case 6:
-			case 7:
-				sprintf(ret, "DWORD PTR DS:[%s]", reg_table(rm, bwd));
-				break;
 			}
 			break;
 		case 0x01:
 			switch (rm) {
-			case 0:
-			case 1:
-			case 2:
-			case 3:	// sign-extended 8-bit displacement follows
+			case 0:	// Mod = 01, R/M = 000
+			case 1:	// Mod = 01, R/M = 001
+			case 2:	// Mod = 01, R/M = 010
+			case 3:	// Mod = 01, R/M = 011
+			case 5:	// Mod = 01, R/M = 101
+			case 6:	// Mod = 01, R/M = 110
+			case 7:	// Mod = 01, R/M = 111
+				// sign-extended 8-bit displacement follows
 				b = fgetc(fp);
 				if (b & 0x80) {
 					sprintf(ret, "DWORD PTR DS:[%s-%X]", reg_table(rm, bwd), ((~b)+1));
@@ -268,15 +257,17 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 					sprintf(ret, "DWORD PTR DS:[%s+%X]", reg_table(rm, bwd), b);
 				}
 				break;
-			case 4:
-				//TODO
-				break;
-			case 5:
-				//TODO
-				break;
-			case 6:
-			case 7:
-				//TODO
+			case 4:	// Mod = 01, R/M = 100
+				// SIB byte follows
+				b = fgetc(fp);
+				tmp = sib_to_str(b);
+				// sign-extended 8-bit displacement follows
+				b = fgetc(fp);
+				if (b & 0x80) {
+					sprintf(ret, "DWORD PTR DS:[%s-%X]", tmp, ((~b)+1));
+				} else {
+					sprintf(ret, "DWORD PTR DS:[%s+%X]", tmp, b);
+				}
 				break;
 			}
 			break;
