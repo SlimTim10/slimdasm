@@ -82,20 +82,20 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		}
 		break;
 
-	case 0x85:	/* 85 /r  TEST r/m32,r32 */
-		b = fgetc(fp);
-		mod = get_mod(b);
-		if (mod == 0) {
-			//TODO
-		} else if (mod == 3) {
-			opa1 = reg_table(get_regop(b), 'd');
-			opa2 = reg_table(get_rm(b), 'd');
-		} else {
-			opa1 = "OPA1ERR";
-			opa2 = "OPA2ERR";
-		}
-		sprintf(ret, "TEST %s,%s", opa1, opa2);
-		break;
+	/* case 0x85:	/\* 85 /r  TEST r/m32,r32 *\/ */
+	/* 	b = fgetc(fp); */
+	/* 	mod = get_mod(b); */
+	/* 	if (mod == 0) { */
+	/* 		//TODO */
+	/* 	} else if (mod == 3) { */
+	/* 		opa1 = reg_table(get_regop(b), 'd'); */
+	/* 		opa2 = reg_table(get_rm(b), 'd'); */
+	/* 	} else { */
+	/* 		opa1 = "OPA1ERR"; */
+	/* 		opa2 = "OPA2ERR"; */
+	/* 	} */
+	/* 	sprintf(ret, "TEST %s,%s", opa1, opa2); */
+	/* 	break; */
 
 	case 0x89:	// MOV Ev,Gv
 		b = fgetc(fp);
@@ -203,6 +203,19 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 	BYTE rm = get_rm(b);
 	DWORD val32;
 	char *tmp;
+	char *size = (char *) malloc(8 * sizeof(char));	// BYTE/WORD/DWORD
+
+	switch (bwd) {
+	case 'b':
+		size = "BYTE";
+		break;
+	case 'w':
+		size = "WORD";
+		break;
+	case 'd':
+		size = "DWORD";
+		break;
+	}
 
 	switch (addr_code) {
 	case 'E':	// Register or memory address
@@ -215,12 +228,12 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 			case 3:	// Mod = 00, R/M = 011
 			case 6:	// Mod = 00, R/M = 110
 			case 7:	// Mod = 00, R/M = 111
-				sprintf(ret, "DWORD PTR [%s]", reg_table(rm, bwd));
+				sprintf(ret, "%s PTR [%s]", size, reg_table(rm, bwd));
 				break;
 			case 4:	// Mod = 00, R/M = 100
 				// SIB byte follows
 				b = fgetc(fp);
-				sprintf(ret, "DWORD PTR [%s]", sib_to_str(b));
+				sprintf(ret, "%s PTR [%s]", size, sib_to_str(b));
 				break;
 			case 5:	// Mod = 00, R/M = 101
 				// 32-bit displacement follows
@@ -228,7 +241,7 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 					+ (fgetc(fp) << 8)
 					+ (fgetc(fp) << 16)
 					+ (fgetc(fp) << 24);
-				sprintf(ret, "CALL DWORD PTR [%X]", val32);
+				sprintf(ret, "%s PTR [%X]", size, val32);
 				break;
 			}
 			break;
@@ -244,9 +257,9 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 				// sign-extended 8-bit displacement follows
 				b = fgetc(fp);
 				if (b & 0x80) {
-					sprintf(ret, "DWORD PTR [%s-%X]", reg_table(rm, bwd), ((~b)+1));
+					sprintf(ret, "%s PTR [%s-%X]", size, reg_table(rm, bwd), ((~b)+1));
 				} else {
-					sprintf(ret, "DWORD PTR [%s+%X]", reg_table(rm, bwd), b);
+					sprintf(ret, "%s PTR [%s+%X]", size, reg_table(rm, bwd), b);
 				}
 				break;
 			case 4:	// Mod = 01, R/M = 100
@@ -256,9 +269,9 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 				// sign-extended 8-bit displacement follows
 				b = fgetc(fp);
 				if (b & 0x80) {
-					sprintf(ret, "DWORD PTR [%s-%X]", tmp, ((~b)+1));
+					sprintf(ret, "%s PTR [%s-%X]", size, tmp, ((~b)+1));
 				} else {
-					sprintf(ret, "DWORD PTR [%s+%X]", tmp, b);
+					sprintf(ret, "%s PTR [%s+%X]", size, tmp, b);
 				}
 				break;
 			}
@@ -277,7 +290,7 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 					+ (fgetc(fp) << 8)
 					+ (fgetc(fp) << 16)
 					+ (fgetc(fp) << 24);
-				sprintf(ret, "DWORD PTR [%s+%X]", reg_table(rm, bwd), val32);
+				sprintf(ret, "%s PTR [%s+%X]", size, reg_table(rm, bwd), val32);
 				break;
 			case 4:	// Mod = 10, R/M = 100
 				// SIB byte follows
@@ -288,7 +301,7 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 					+ (fgetc(fp) << 8)
 					+ (fgetc(fp) << 16)
 					+ (fgetc(fp) << 24);
-				sprintf(ret, "DWORD PTR [%s+%X]", tmp, val32);
+				sprintf(ret, "%s PTR [%s+%X]", size, tmp, val32);
 				break;
 			}
 			break;
