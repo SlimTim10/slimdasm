@@ -542,6 +542,86 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "OUTS DX,DWORD PTR ES:[EDI]");
 		break;
 
+	case 0x70:	// JO SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JO SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x71:	// JNO SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JNO SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x72:	// JB SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JB SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x73:	// JAE SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JAE SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x74:	// JE SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JE SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x75:	// JNE SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JNE SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x76:	// JBE SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JBE SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x77:	// JA SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JA SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x78:	// JS SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JS SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x79:	// JNS SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JNS SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x7A:	// JP SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JP SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x7B:	// JNP SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JNP SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x7C:	// JL SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JL SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x7D:	// JGE SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JGE SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x7E:	// JLE SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JLE SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
+	case 0x7F:	// JG SHORT
+		b = fgetc(fp);
+		sprintf(ret, "JG SHORT %X", curaddr + 2 + (signed char) b);
+		break;
+
 	//TODO
 
 	case 0x85:	// TEST Ev,Gv
@@ -582,12 +662,6 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 ///OLD
-
-	case 0x74:	/* 74 cb  JE rel8 */
-		// Get 1-byte operand for offset
-		b = fgetc(fp);
-		sprintf(ret, "JE SHORT %.8X", (b + 2 + curaddr));
-		break;
 
 	case 0x83:	/* 83 /d ib */
 		// Get ModR/M and opcode extension
