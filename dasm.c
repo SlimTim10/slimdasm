@@ -218,6 +218,330 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "POP DS");
 		break;
 
+	case 0x20:	// AND Eb,Gb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "AND %s,%s", opa1, opa2);
+		break;
+
+	case 0x21:	// AND Ev,Gv
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa2 = parse_modrm(fp, b, 'G', 'd');
+		sprintf(ret, "AND %s,%s", opa1, opa2);
+		break;
+
+	case 0x22:	// AND Gb,Eb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "AND %s,%s", opa1, opa2);
+		break;
+
+	case 0x23:	// AND Gv,Ev
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "AND %s,%s", opa1, opa2);
+		break;
+
+	case 0x24:	// AND AL,Ib
+		b = fgetc(fp);
+		sprintf(ret, "AND AL,%X", b);
+		break;
+
+	case 0x25:	// AND EAX,Iv
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "AND EAX,%X", val32);
+
+	case 0x26:	// SEG=ES
+		sprintf(ret, "SEG=ES");
+		break;
+
+	case 0x27:	// DAA
+		sprintf(ret, "DAA");
+		break;
+
+	case 0x28:	// SUB Eb,Gb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "SUB %s,%s", opa1, opa2);
+		break;
+
+	case 0x29:	// SUB Ev,Gv
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa2 = parse_modrm(fp, b, 'G', 'd');
+		sprintf(ret, "SUB %s,%s", opa1, opa2);
+		break;
+
+	case 0x2A:	// SUB Gb,Eb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "SUB %s,%s", opa1, opa2);
+		break;
+
+	case 0x2B:	// SUB Gv,Ev
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "SUB %s,%s", opa1, opa2);
+		break;
+
+	case 0x2C:	// SUB AL,Ib
+		b = fgetc(fp);
+		sprintf(ret, "SUB AL,%X", b);
+		break;
+
+	case 0x2D:	// SUB EAX,Iv
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "SUB EAX,%X", val32);
+
+	case 0x2E:	// SEG=CS
+		sprintf(ret, "SEG=CS");
+		break;
+
+	case 0x2F:	// DAS
+		sprintf(ret, "DAS");
+		break;
+
+	case 0x30:	// XOR Eb,Gb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "XOR %s,%s", opa1, opa2);
+		break;
+
+	case 0x31:	// XOR Ev,Gv
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa2 = parse_modrm(fp, b, 'G', 'd');
+		sprintf(ret, "XOR %s,%s", opa1, opa2);
+		break;
+
+	case 0x32:	// XOR Gb,Eb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "XOR %s,%s", opa1, opa2);
+		break;
+
+	case 0x33:	// XOR Gv,Ev
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "XOR %s,%s", opa1, opa2);
+		break;
+
+	case 0x34:	// XOR AL,Ib
+		b = fgetc(fp);
+		sprintf(ret, "XOR AL,%X", b);
+		break;
+
+	case 0x35:	// XOR EAX,Iv
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "XOR EAX,%X", val32);
+
+	case 0x36:	// SEG=SS
+		sprintf(ret, "SEG=SS");
+		break;
+
+	case 0x37:	// AAA
+		sprintf(ret, "AAA");
+		break;
+
+	case 0x38:	// CMP Eb,Gb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "CMP %s,%s", opa1, opa2);
+		break;
+
+	case 0x39:	// CMP Ev,Gv
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa2 = parse_modrm(fp, b, 'G', 'd');
+		sprintf(ret, "CMP %s,%s", opa1, opa2);
+		break;
+
+	case 0x3A:	// CMP Gb,Eb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "CMP %s,%s", opa1, opa2);
+		break;
+
+	case 0x3B:	// CMP Gv,Ev
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "CMP %s,%s", opa1, opa2);
+		break;
+
+	case 0x3C:	// CMP AL,Ib
+		b = fgetc(fp);
+		sprintf(ret, "CMP AL,%X", b);
+		break;
+
+	case 0x3D:	// CMP EAX,Iv
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "CMP EAX,%X", val32);
+
+	case 0x3E:	// SEG=DS
+		sprintf(ret, "SEG=DS");
+		break;
+
+	case 0x3F:	// AAS
+		sprintf(ret, "AAS");
+		break;
+
+	case 0x40:	// INC EAX
+	case 0x41:	// INC ECX
+	case 0x42:	// INC EDX
+	case 0x43:	// INC EBX
+	case 0x44:	// INC ESP
+	case 0x45:	// INC EBP
+	case 0x46:	// INC ESI
+	case 0x47:	// INC EDI
+	 	sprintf(ret, "INC %s", reg_table(b, 'd'));	// Same order as reg table
+		break;
+
+	case 0x48:	// DEC EAX
+	case 0x49:	// DEC ECX
+	case 0x4A:	// DEC EDX
+	case 0x4B:	// DEC EBX
+	case 0x4C:	// DEC ESP
+	case 0x4D:	// DEC EBP
+	case 0x4E:	// DEC ESI
+	case 0x4F:	// DEC EDI
+	 	sprintf(ret, "DEC %s", reg_table(b-7, 'd'));
+		break;
+
+	case 0x50:	// PUSH EAX
+	case 0x51:	// PUSH ECX
+	case 0x52:	// PUSH EDX
+	case 0x53:	// PUSH EBX
+	case 0x54:	// PUSH ESP
+	case 0x55:	// PUSH EBP
+	case 0x56:	// PUSH ESI
+	case 0x57:	// PUSH EDI
+	 	sprintf(ret, "PUSH %s", reg_table(b, 'd'));
+		break;
+
+	case 0x58:	// POP EAX
+	case 0x59:	// POP ECX
+	case 0x5A:	// POP EDX
+	case 0x5B:	// POP EBX
+	case 0x5C:	// POP ESP
+	case 0x5D:	// POP EBP
+	case 0x5E:	// POP ESI
+	case 0x5F:	// POP EDI
+	 	sprintf(ret, "PUSH %s", reg_table(b-7, 'd'));
+		break;
+
+	case 0x60:	// PUSHAD
+		sprintf(ret, "PUSHAD");
+		break;
+
+	case 0x61:	// POPAD
+		sprintf(ret, "POPAD");
+		break;
+
+	case 0x62:	// BOUND Gv,Ma
+		//TODO
+		break;
+
+	case 0x63:	// ARPL Ew,Gw
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'w');
+		opa2 = parse_modrm(fp, b, 'G', 'w');
+		sprintf(ret, "ARPL %s,%s", opa1, opa2);
+		break;
+
+	case 0x64:	// SEG=FS
+		sprintf(ret, "SEG=FS");
+		break;
+
+	case 0x65:	// SEG=GS
+		sprintf(ret, "SEG=GS");
+		break;
+
+	case 0x66:	// Operand size override
+		sprintf(ret, "Opd Size 16");
+		break;
+
+	case 0x67:	// Address size override
+		sprintf(ret, "Addr Size 16");
+		break;
+
+	case 0x68:	// PUSH Iv
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "PUSH %X", val32);
+		break;
+
+	case 0x69:	// IMUL Gv,Ev,Iv
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "IMUL %s,%s,%X", opa1, opa2, val32);
+		break;
+
+	case 0x6A:	// PUSH Ib
+		b = fgetc(fp);
+		// Signed byte
+		if (b & 0x80) {
+			sprintf(ret, "PUSH -%X", ((~b)+1));
+		} else {
+			sprintf(ret, "PUSH %X", b);
+		}
+		break;
+
+	case 0x6B:	// IMUL Gv,Ev,Ib
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fp);
+		sprintf(ret, "IMUL %s,%s,%X", opa1, opa2, b);
+		break;
+
+	case 0x6C:	// INS Yb,DX
+		sprintf(ret, "INS BYTE PTR ES:[EDI],DX");
+		break;
+
+	case 0x6D:	// INS Yv,DX
+		sprintf(ret, "INS DWORD PTR ES:[EDI],DX");
+		break;
+
+	case 0x6E:	// OUTS DX,Xb
+		sprintf(ret, "OUTS DX,BYTE PTR ES:[EDI]");
+		break;
+
+	case 0x6F:	// OUTS DX,Xv
+		sprintf(ret, "OUTS DX,DWORD PTR ES:[EDI]");
+		break;
+
 	//TODO
 
 	case 0x85:	// TEST Ev,Gv
@@ -227,12 +551,16 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "TEST %s,%s", opa1, opa2);
 		break;
 
+	//TODO
+
 	case 0x89:	// MOV Ev,Gv
 		b = fgetc(fp);
 		opa1 = parse_modrm(fp, b, 'E', 'd');
 		opa2 = parse_modrm(fp, b, 'G', 'd');
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
+
+	//TODO
 
 	case 0x8B:	// MOV Gv,Ev
 		b = fgetc(fp);
@@ -241,20 +569,19 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
 
-	case 0x50:	/* 50+rd  PUSH r32 */
-	case 0x51:	/* 50+rd  PUSH r32 */
-	case 0x52:	/* 50+rd  PUSH r32 */
-	case 0x53:	/* 50+rd  PUSH r32 */
-	case 0x54:	/* 50+rd  PUSH r32 */
-	case 0x55:	/* 50+rd  PUSH r32 */
-	case 0x56:	/* 50+rd  PUSH r32 */
-	case 0x57:	/* 50+rd  PUSH r32 */
-		sprintf(ret, "PUSH %s", reg_table(b, 'd'));
+	//TODO
+
+	case 0xC3:	// RETN
+		sprintf(ret, "RETN");
 		break;
 
-	case 0x66:	/* Operand-size override */
-		//TODO
+	//TODO
+
+	case 0xCC:	// INT 3
+		sprintf(ret, "INT 3");
 		break;
+
+///OLD
 
 	case 0x74:	/* 74 cb  JE rel8 */
 		// Get 1-byte operand for offset
@@ -287,21 +614,6 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			break;
 		}
 		break;
-
-	/* case 0x85:	/\* 85 /r  TEST r/m32,r32 *\/ */
-	/* 	b = fgetc(fp); */
-	/* 	mod = get_mod(b); */
-	/* 	if (mod == 0) { */
-	/* 		//TODO */
-	/* 	} else if (mod == 3) { */
-	/* 		opa1 = reg_table(get_regop(b), 'd'); */
-	/* 		opa2 = reg_table(get_rm(b), 'd'); */
-	/* 	} else { */
-	/* 		opa1 = "OPA1ERR"; */
-	/* 		opa2 = "OPA2ERR"; */
-	/* 	} */
-	/* 	sprintf(ret, "TEST %s,%s", opa1, opa2); */
-	/* 	break; */
 
 	case 0xA1:	/* A1  MOV EAX,moffs32* */
 		val32 = 0;
