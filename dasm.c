@@ -33,6 +33,200 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "ADD %s,%s", opa1, opa2);
 		break;
 
+	case 0x01:	// ADD Ev,Gv
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa2 = parse_modrm(fp, b, 'G', 'd');
+		sprintf(ret, "ADD %s,%s", opa1, opa2);
+		break;
+
+	case 0x02:	// ADD Gb,Eb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "ADD %s,%s", opa1, opa2);
+		break;
+
+	case 0x03:	// ADD Gv,Ev
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "ADD %s,%s", opa1, opa2);
+		break;
+
+	case 0x04:	// ADD AL,Ib
+		b = fgetc(fp);
+		sprintf(ret, "ADD AL,%X", b);
+		break;
+
+	case 0x05:	// ADD EAX,Iv
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "ADD EAX,%X", val32);
+
+	case 0x06:	// PUSH ES
+		sprintf(ret, "PUSH ES");
+		break;
+
+	case 0x07:	// POP ES
+		sprintf(ret, "POP ES");
+		break;
+
+	case 0x08:	// OR Eb,Gb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "OR %s,%s", opa1, opa2);
+		break;
+
+	case 0x09:	// OR Ev,Gv
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa2 = parse_modrm(fp, b, 'G', 'd');
+		sprintf(ret, "OR %s,%s", opa1, opa2);
+		break;
+
+	case 0x0A:	// OR Gb,Eb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "OR %s,%s", opa1, opa2);
+		break;
+
+	case 0x0B:	// OR Gv,Ev
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "OR %s,%s", opa1, opa2);
+		break;
+
+	case 0x0C:	// OR AL,Ib
+		b = fgetc(fp);
+		sprintf(ret, "OR AL,%X", b);
+		break;
+
+	case 0x0D:	// OR EAX,Iv
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "OR EAX,%X", val32);
+
+	case 0x0E:	// PUSH CS
+		sprintf(ret, "PUSH CS");
+		break;
+
+	case 0x0F:	// 2-byte escape
+		sprintf(ret, "???");
+		break;
+
+	case 0x10:	// ADC Eb,Gb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "ADC %s,%s", opa1, opa2);
+		break;
+
+	case 0x11:	// ADC Ev,Gv
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa2 = parse_modrm(fp, b, 'G', 'd');
+		sprintf(ret, "ADC %s,%s", opa1, opa2);
+		break;
+
+	case 0x12:	// ADC Gb,Eb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "ADC %s,%s", opa1, opa2);
+		break;
+
+	case 0x13:	// ADC Gv,Ev
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "ADC %s,%s", opa1, opa2);
+		break;
+
+	case 0x14:	// ADC AL,Ib
+		b = fgetc(fp);
+		sprintf(ret, "ADC AL,%X", b);
+		break;
+
+	case 0x15:	// ADC EAX,Iv
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "ADC EAX,%X", val32);
+
+	case 0x16:	// PUSH SS
+		sprintf(ret, "PUSH SS");
+		break;
+
+	case 0x17:	// POP SS
+		sprintf(ret, "POP SS");
+		break;
+
+	case 0x18:	// SBB Eb,Gb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "SBB %s,%s", opa1, opa2);
+		break;
+
+	case 0x19:	// SBB Ev,Gv
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa2 = parse_modrm(fp, b, 'G', 'd');
+		sprintf(ret, "SBB %s,%s", opa1, opa2);
+		break;
+
+	case 0x1A:	// SBB Gb,Eb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "SBB %s,%s", opa1, opa2);
+		break;
+
+	case 0x1B:	// SBB Gv,Ev
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "SBB %s,%s", opa1, opa2);
+		break;
+
+	case 0x1C:	// SBB AL,Ib
+		b = fgetc(fp);
+		sprintf(ret, "SBB AL,%X", b);
+		break;
+
+	case 0x1D:	// SBB EAX,Iv
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "SBB EAX,%X", val32);
+
+	case 0x1E:	// PUSH DS
+		sprintf(ret, "PUSH DS");
+		break;
+
+	case 0x1F:	// POP DS
+		sprintf(ret, "POP DS");
+		break;
+
+	//TODO
+
+	case 0x85:	// TEST Ev,Gv
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa2 = parse_modrm(fp, b, 'G', 'd');
+		sprintf(ret, "TEST %s,%s", opa1, opa2);
+		break;
+
 	case 0x89:	// MOV Ev,Gv
 		b = fgetc(fp);
 		opa1 = parse_modrm(fp, b, 'E', 'd');
@@ -46,15 +240,6 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		opa2 = parse_modrm(fp, b, 'E', 'd');
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
-
-	/* case 0x00:	/\* 00 /r	ADD r/m8,r8 *\/ */
-	/* 	/\* ADD Eb,Gb *\/ */
-	/* 	// Get ModR/M byte */
-	/* 	b = fgetc(fp); */
-	/* 	opa1 = parse_modrm(b); */
-	/* 	sprintf(ret, "ADD", opa1); */
-	/* 	mod = get_mod(b); */
-	/* 	break; */
 
 	case 0x50:	/* 50+rd  PUSH r32 */
 	case 0x51:	/* 50+rd  PUSH r32 */
