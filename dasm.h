@@ -10,5 +10,6 @@ BYTE get_regop(BYTE);
 BYTE get_rm(BYTE);
 char *reg_table(BYTE, char);
 char *sib_to_str(BYTE);
+char *group1_op(BYTE);
 
 #endif

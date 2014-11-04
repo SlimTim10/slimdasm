@@ -14,9 +14,10 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	BYTE b = fgetc(fp);
 	BYTE mod;
 	BYTE ext;
-	char *ret = (char *) malloc(64 * sizeof(char));
-	char *opa1 = (char *) malloc(64 * sizeof(char));
-	char *opa2 = (char *) malloc(64 * sizeof(char));
+	char *ret = (char *) malloc(64 * sizeof(char));	// Return string
+	char *op = (char *) malloc(64 * sizeof(char));	// Opcode
+	char *opa1 = (char *) malloc(64 * sizeof(char));	// Operand
+	char *opa2 = (char *) malloc(64 * sizeof(char));	// Operand
 	char *tmp;
 	DWORD val32;
 	int i;
@@ -622,6 +623,45 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "JG SHORT %X", curaddr + 2 + (signed char) b);
 		break;
 
+	// Immediate Group 1
+	case 0x80:	// Eb,Ib
+		b = fgetc(fp);
+		op = group1_op(get_regop(b));
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		b = fgetc(fp);
+		sprintf(ret, "%s %s,%X", op, opa1, b);
+		break;
+
+	// Immediate Group 1
+	case 0x81:	// Ev,Iv
+		b = fgetc(fp);
+		op = group1_op(get_regop(b));
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "%s %s,%X", op, opa1, val32);
+		break;
+
+	// Immediate Group 1
+	case 0x82:	// Ev,Ib
+		b = fgetc(fp);
+		op = group1_op(get_regop(b));
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fp);
+		sprintf(ret, "%s %s,%X", op, opa1, b);
+		break;
+
+	// Immediate Group 1
+	case 0x83:	// Ev,Ib
+		b = fgetc(fp);
+		op = group1_op(get_regop(b));
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fp);
+		sprintf(ret, "%s %s,%X", op, opa1, b);
+		break;
+
 	//TODO
 
 	case 0x85:	// TEST Ev,Gv
@@ -663,31 +703,31 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 ///OLD
 
-	case 0x83:	/* 83 /d ib */
-		// Get ModR/M and opcode extension
-		b = fgetc(fp);
-		mod = get_mod(b);
-		ext = get_regop(b);
-		switch (ext) {
-		case 5:	/* 83 /5 ib  SUB r/m32,imm8 */
-			if (mod == 0) {
-				//TODO
-			} else if (mod == 3) {
-				opa1 = reg_table(get_rm(b), 'd');
-				// Get constant argument
-				b = fgetc(fp);
-				*opa2 = b;
-			} else {
-				opa1 = "OPA1ERR";
-				opa2 = "OPA2ERR";
-			}
-			sprintf(ret, "SUB %s,%X", opa1, *opa2);
-			break;
-		default:
-			ret = "OPCERR";
-			break;
-		}
-		break;
+	/* case 0x83:	/\* 83 /d ib *\/ */
+	/* 	// Get ModR/M and opcode extension */
+	/* 	b = fgetc(fp); */
+	/* 	mod = get_mod(b); */
+	/* 	ext = get_regop(b); */
+	/* 	switch (ext) { */
+	/* 	case 5:	/\* 83 /5 ib  SUB r/m32,imm8 *\/ */
+	/* 		if (mod == 0) { */
+	/* 			//TODO */
+	/* 		} else if (mod == 3) { */
+	/* 			opa1 = reg_table(get_rm(b), 'd'); */
+	/* 			// Get constant argument */
+	/* 			b = fgetc(fp); */
+	/* 			*opa2 = b; */
+	/* 		} else { */
+	/* 			opa1 = "OPA1ERR"; */
+	/* 			opa2 = "OPA2ERR"; */
+	/* 		} */
+	/* 		sprintf(ret, "SUB %s,%X", opa1, *opa2); */
+	/* 		break; */
+	/* 	default: */
+	/* 		ret = "OPCERR"; */
+	/* 		break; */
+	/* 	} */
+	/* 	break; */
 
 	case 0xA1:	/* A1  MOV EAX,moffs32* */
 		val32 = 0;
@@ -1052,6 +1092,36 @@ char *sib_to_str(BYTE sib) {
 	}
 
 	return str;
+}
+
+/* Return string of corresponding opcode for Group 1, according to Table A-6 */
+char *group1_op(BYTE op) {
+	switch (op) {
+	case 0:
+		return "ADD";
+		break;
+	case 1:
+		return "OR";
+		break;
+	case 2:
+		return "ADC";
+		break;
+	case 3:
+		return "SBB";
+		break;
+	case 4:
+		return "AND";
+		break;
+	case 5:
+		return "SUB";
+		break;
+	case 6:
+		return "XOR";
+		break;
+	case 7:
+		return "CMP";
+		break;
+	}
 }
 
 #endif
