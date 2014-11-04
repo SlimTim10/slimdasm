@@ -19,6 +19,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	char *opa1 = (char *) malloc(64 * sizeof(char));	// Operand
 	char *opa2 = (char *) malloc(64 * sizeof(char));	// Operand
 	char *tmp;
+	WORD val16;
 	DWORD val32;
 	int i;
 
@@ -743,6 +744,59 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		b = fgetc(fp);
 		opa1 = parse_modrm(fp, b, 'E', 'd');
 		sprintf(ret, "POP %s", opa1);
+		break;
+
+	case 0x90:	// NOP
+		sprintf(ret, "NOP");
+		break;
+
+	// XCHG register with EAX
+	case 0x91:
+	case 0x92:
+	case 0x93:
+	case 0x94:
+	case 0x95:
+	case 0x96:
+	case 0x97:
+		sprintf(ret, "XCHG EAX,%s", reg_table(b, 'd'));
+		break;
+
+	case 0x98:	// CWDE
+		sprintf(ret, "CWDE");
+		break;
+
+	case 0x99:	// CDQ
+		sprintf(ret, "CDQ");
+		break;
+
+	case 0x9A:	// CALLF Ap
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		val16 = fgetc(fp)
+			+ (fgetc(fp) << 8);
+		sprintf(ret, "CALL FAR %X:%X", val16, val32);
+		break;
+
+	case 0x9B:	// WAIT
+		sprintf(ret, "WAIT");
+		break;
+
+	case 0x9C:	// PUSHFD
+		sprintf(ret, "PUSHFD");
+		break;
+
+	case 0x9D:	// POPFD
+		sprintf(ret, "POPFD");
+		break;
+
+	case 0x9E:	// SAHF
+		sprintf(ret, "SAHF");
+		break;
+
+	case 0x9F:	// LAHF
+		sprintf(ret, "LAHF");
 		break;
 
 	//TODO
