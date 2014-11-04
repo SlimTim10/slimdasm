@@ -718,6 +718,33 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
 
+	case 0x8C:	// MOV Ew,Sw
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'w');
+		opa2 = segreg_table(get_regop(b));
+		sprintf(ret, "MOV %s,%s", opa1, opa2);
+		break;
+
+	case 0x8D:	// LEA Gv,M
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "LEA %s,%s", opa1, opa2);
+		break;
+
+	case 0x8E:	// MOV Sw,Ew
+		b = fgetc(fp);
+		opa1 = segreg_table(get_regop(b));
+		opa2 = parse_modrm(fp, b, 'E', 'w');
+		sprintf(ret, "MOV %s,%s", opa1, opa2);
+		break;
+
+	case 0x8F:	// POP Ev
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "POP %s", opa1);
+		break;
+
 	//TODO
 
 	case 0xC3:	// RETN
@@ -1003,99 +1030,120 @@ char *reg_table(BYTE b, char bwd) {
 	case 'b':
 		switch (b) {
 		case 0:
-			reg = "AL";
+			return "AL";
 			break;
 		case 1:
-			reg = "CL";
+			return "CL";
 			break;
 		case 2:
-			reg = "DL";
+			return "DL";
 			break;
 		case 3:
-			reg = "BL";
+			return "BL";
 			break;
 		case 4:
-			reg = "AH";
+			return "AH";
 			break;
 		case 5:
-			reg = "CH";
+			return "CH";
 			break;
 		case 6:
-			reg = "DH";
+			return "DH";
 			break;
 		case 7:
-			reg = "BH";
-			break;
-		default:
+			return "BH";
 			break;
 		}
 		break;
 	case 'w':
 		switch (b) {
 		case 0:
-			reg = "AX";
+			return "AX";
 			break;
 		case 1:
-			reg = "CX";
+			return "CX";
 			break;
 		case 2:
-			reg = "DX";
+			return "DX";
 			break;
 		case 3:
-			reg = "BX";
+			return "BX";
 			break;
 		case 4:
-			reg = "SP";
+			return "SP";
 			break;
 		case 5:
-			reg = "BP";
+			return "BP";
 			break;
 		case 6:
-			reg = "SI";
+			return "SI";
 			break;
 		case 7:
-			reg = "DI";
-			break;
-		default:
+			return "DI";
 			break;
 		}
 		break;
 	case 'd':
 		switch (b) {
 		case 0:
-			reg = "EAX";
+			return "EAX";
 			break;
 		case 1:
-			reg = "ECX";
+			return "ECX";
 			break;
 		case 2:
-			reg = "EDX";
+			return "EDX";
 			break;
 		case 3:
-			reg = "EBX";
+			return "EBX";
 			break;
 		case 4:
-			reg = "ESP";
+			return "ESP";
 			break;
 		case 5:
-			reg = "EBP";
+			return "EBP";
 			break;
 		case 6:
-			reg = "ESI";
+			return "ESI";
 			break;
 		case 7:
-			reg = "EDI";
-			break;
-		default:
+			return "EDI";
 			break;
 		}
 		break;
 	default:
-		reg = "REGERR";
+		return "REGERR";
 		break;
 	}
 
 	return reg;
+}
+
+/* Return segment register corresponding to given byte, according to Table B-6 */
+char *segreg_table(BYTE reg) {
+	switch (reg) {
+	case 0:
+		return "ES";
+		break;
+	case 1:
+		return "CS";
+		break;
+	case 2:
+		return "SS";
+		break;
+	case 3:
+		return "DS";
+		break;
+	case 4:
+		return "FS";
+		break;
+	case 5:
+		return "GS";
+		break;
+	default:
+		return "REGERR";
+		break;
+	}
 }
 
 /* Return string from given SIB (Scale-Index-Base) byte */
@@ -1149,6 +1197,9 @@ char *group1_op(BYTE op) {
 		break;
 	case 7:
 		return "CMP";
+		break;
+	default:
+		return "REGERR";
 		break;
 	}
 }
