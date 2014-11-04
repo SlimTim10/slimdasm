@@ -799,6 +799,38 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "LAHF");
 		break;
 
+	case 0xA0:	// MOV AL,Ob
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "MOV AL,BYTE PTR [%X]", val32);
+		break;
+
+	case 0xA1:	// MOV EAX,Ov
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "MOV EAX,DWORD PTR [%X]", val32);
+		break;
+
+	case 0xA2:	// MOV Ob,AL
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "MOV BYTE PTR [%X],AL", val32);
+		break;
+
+	case 0xA3:	// MOV Ov,EAX
+		val32 = fgetc(fp)
+			+ (fgetc(fp) << 8)
+			+ (fgetc(fp) << 16)
+			+ (fgetc(fp) << 24);
+		sprintf(ret, "MOV DWORD PTR [%X],EAX", val32);
+		break;
+
 	//TODO
 
 	case 0xC3:	// RETN
@@ -812,41 +844,6 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 ///OLD
-
-	/* case 0x83:	/\* 83 /d ib *\/ */
-	/* 	// Get ModR/M and opcode extension */
-	/* 	b = fgetc(fp); */
-	/* 	mod = get_mod(b); */
-	/* 	ext = get_regop(b); */
-	/* 	switch (ext) { */
-	/* 	case 5:	/\* 83 /5 ib  SUB r/m32,imm8 *\/ */
-	/* 		if (mod == 0) { */
-	/* 			//TODO */
-	/* 		} else if (mod == 3) { */
-	/* 			opa1 = reg_table(get_rm(b), 'd'); */
-	/* 			// Get constant argument */
-	/* 			b = fgetc(fp); */
-	/* 			*opa2 = b; */
-	/* 		} else { */
-	/* 			opa1 = "OPA1ERR"; */
-	/* 			opa2 = "OPA2ERR"; */
-	/* 		} */
-	/* 		sprintf(ret, "SUB %s,%X", opa1, *opa2); */
-	/* 		break; */
-	/* 	default: */
-	/* 		ret = "OPCERR"; */
-	/* 		break; */
-	/* 	} */
-	/* 	break; */
-
-	case 0xA1:	/* A1  MOV EAX,moffs32* */
-		val32 = 0;
-		for (i = 0; i < 4; i++) {
-			b = fgetc(fp);
-			val32 |= (b << (i * 8));
-		}
-		sprintf(ret, "MOV EAX,DWORD PTR [%X]", val32);
-		break;
 
 	case 0xC7:	/* C7 /0  MOV r/m32,imm32 */
 		b = fgetc(fp);		// Get ModR/M and opcode extension
