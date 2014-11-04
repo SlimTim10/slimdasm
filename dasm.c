@@ -662,7 +662,12 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "%s %s,%X", op, opa1, b);
 		break;
 
-	//TODO
+	case 0x84:	// TEST Eb,Gb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "TEST %s,%s", opa1, opa2);
+		break;
 
 	case 0x85:	// TEST Ev,Gv
 		b = fgetc(fp);
@@ -671,7 +676,26 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "TEST %s,%s", opa1, opa2);
 		break;
 
-	//TODO
+	case 0x86:	// XCHG Eb,Gb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "XCHG %s,%s", opa1, opa2);
+		break;
+
+	case 0x87:	// XCHG Ev,Gv
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa2 = parse_modrm(fp, b, 'G', 'd');
+		sprintf(ret, "XCHG %s,%s", opa1, opa2);
+		break;
+
+	case 0x88:	// MOV Eb,Gb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa2 = parse_modrm(fp, b, 'G', 'b');
+		sprintf(ret, "MOV %s,%s", opa1, opa2);
+		break;
 
 	case 0x89:	// MOV Ev,Gv
 		b = fgetc(fp);
@@ -680,7 +704,12 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
 
-	//TODO
+	case 0x8A:	// MOV Gb,Eb
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'b');
+		opa2 = parse_modrm(fp, b, 'E', 'b');
+		sprintf(ret, "MOV %s,%s", opa1, opa2);
+		break;
 
 	case 0x8B:	// MOV Gv,Ev
 		b = fgetc(fp);
