@@ -5,6 +5,7 @@
 
 char *parse_instr(FILE *, long int);
 char *parse_modrm(FILE *, BYTE, char, char);
+WORD get_word(FILE *);
 DWORD get_dword(FILE *);
 
 BYTE get_mod(BYTE);
