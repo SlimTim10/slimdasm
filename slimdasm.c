@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
 	BYTE *fbuf;
 	PESTRUCT *pe;
 
-	fbuf = (BYTE *) malloc(256 * sizeof(char));
+	fbuf = (BYTE *) malloc(256 * sizeof(BYTE));
 	pe = (PESTRUCT *) malloc(sizeof(PESTRUCT));
 
 	if (argc < 2) {
@@ -43,13 +43,13 @@ int main(int argc, char *argv[]) {
 
 	fseek(fin, codeoffset, SEEK_SET);	// Go to start of code section
 
-	long int len;
+	DWORD len;
 	DWORD addr = pe->base + pe->rvacode;
-	char *instr;
+	BYTE *instr;
 	int i;
 	for (i = 0; i < 256; i++) {	// Only print the first 256 instructions (for testing)
-		len = ftell(fin);
-		instr = parse_instr(fin, addr);
+		len = ftell(fin);	// Get current position in stream
+		instr = parse_instr(fin, addr);	// Parse current instruction
 		printf("%.8X\t%s\n", addr, instr);
 		len = ftell(fin) - len;
 		addr += len;

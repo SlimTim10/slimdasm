@@ -7,9 +7,9 @@
 #include "utils.h"
 #include "defs.h"
 
-/* Return a 32-bit integer of the little endian value of an array of length
+/* Return a DWORD of the little endian value of an array of length
    count (max 4) */
-unsigned long lendian(unsigned char *n, int count) {
+DWORD lendian(BYTE *n, uint8_t count) {
 	int ret = 0;
 	int i, shift;
 

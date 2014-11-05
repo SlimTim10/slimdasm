@@ -62,10 +62,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x05:	// ADD EAX,Iv
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "ADD EAX,%X", val32);
 
 	case 0x06:	// PUSH ES
@@ -110,10 +107,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x0D:	// OR EAX,Iv
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "OR EAX,%X", val32);
 
 	case 0x0E:	// PUSH CS
@@ -158,10 +152,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x15:	// ADC EAX,Iv
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "ADC EAX,%X", val32);
 
 	case 0x16:	// PUSH SS
@@ -206,10 +197,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x1D:	// SBB EAX,Iv
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "SBB EAX,%X", val32);
 
 	case 0x1E:	// PUSH DS
@@ -254,10 +242,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x25:	// AND EAX,Iv
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "AND EAX,%X", val32);
 
 	case 0x26:	// SEG=ES
@@ -302,10 +287,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x2D:	// SUB EAX,Iv
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "SUB EAX,%X", val32);
 
 	case 0x2E:	// SEG=CS
@@ -350,10 +332,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x35:	// XOR EAX,Iv
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "XOR EAX,%X", val32);
 
 	case 0x36:	// SEG=SS
@@ -398,10 +377,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x3D:	// CMP EAX,Iv
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "CMP EAX,%X", val32);
 
 	case 0x3E:	// SEG=DS
@@ -492,10 +468,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x68:	// PUSH Iv
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "PUSH %X", val32);
 		break;
 
@@ -503,10 +476,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		b = fgetc(fp);
 		opa1 = parse_modrm(fp, b, 'G', 'd');
 		opa2 = parse_modrm(fp, b, 'E', 'd');
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "IMUL %s,%s,%X", opa1, opa2, val32);
 		break;
 
@@ -638,10 +608,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		b = fgetc(fp);
 		op = group1_op(get_regop(b));
 		opa1 = parse_modrm(fp, b, 'E', 'd');
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "%s %s,%X", op, opa1, val32);
 		break;
 
@@ -770,10 +737,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x9A:	// CALLF Ap
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		val16 = fgetc(fp)
 			+ (fgetc(fp) << 8);
 		sprintf(ret, "CALL FAR %X:%X", val16, val32);
@@ -800,35 +764,44 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xA0:	// MOV AL,Ob
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "MOV AL,BYTE PTR [%X]", val32);
 		break;
 
 	case 0xA1:	// MOV EAX,Ov
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "MOV EAX,DWORD PTR [%X]", val32);
 		break;
 
 	case 0xA2:	// MOV Ob,AL
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "MOV BYTE PTR [%X],AL", val32);
 		break;
 
 	case 0xA3:	// MOV Ov,EAX
-		val32 = fgetc(fp)
-			+ (fgetc(fp) << 8)
-			+ (fgetc(fp) << 16)
-			+ (fgetc(fp) << 24);
+		val32 = get_dword(fp);
 		sprintf(ret, "MOV DWORD PTR [%X],EAX", val32);
+		break;
+
+	case 0xA4:	// MOVS Xb,Yb
+		sprintf(ret, "MOVS BYTE PTR [ESI],BYTE PTR [EDI]");
+		break;
+
+	case 0xA5:	// MOVS Xv,Yv
+		sprintf(ret, "MOVS DWORD PTR [ESI],DWORD PTR [EDI]");
+		break;
+
+	case 0xA6:	// CMPS Xb,Yb
+		sprintf(ret, "CMPS BYTE PTR [ESI],BYTE PTR [EDI]");
+		break;
+
+	case 0xA7:	// CMPS Xv,Yv
+		sprintf(ret, "CMPS DWORD PTR [ESI],DWORD PTR [EDI]");
+		break;
+
+	case 0xA8:	// TEST AL,Ib
+		b = fgetc(fp);
+		sprintf(ret, "TEST AL,%X", b);
 		break;
 
 	//TODO
@@ -1041,6 +1014,16 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 	}
 
 	return ret;
+}
+
+/* Return next 4 bytes in file as DWORD */
+DWORD get_dword(FILE *fp) {
+	DWORD r = fgetc(fp)
+		| (fgetc(fp) << 8)
+		| (fgetc(fp) << 16)
+		| (fgetc(fp) << 24);
+
+	return r;
 }
 
 /* Return Mod from given ModR/M byte, according to Figure 2-1 */
