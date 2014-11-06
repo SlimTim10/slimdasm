@@ -832,6 +832,19 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "LODS EAX,DWORD PTR [ESI]");
 		break;
 
+	case 0xB0:	// MOV AL,Ib
+	case 0xB1:	// MOV CL,Ib
+	case 0xB2:	// MOV DL,Ib
+	case 0xB3:	// MOV BL,Ib
+	case 0xB4:	// MOV AH,Ib
+	case 0xB5:	// MOV CH,Ib
+	case 0xB6:	// MOV DH,Ib
+	case 0xB7:	// MOV BH,Ib
+		opa1 = reg_table(b, 'b');
+		b = fgetc(fp);
+		sprintf(ret, "MOV %s,%X", opa1, b);
+		break;
+
 	//TODO
 
 	case 0xC3:	// RETN
