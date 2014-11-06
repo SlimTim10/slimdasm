@@ -808,6 +808,30 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "TEST EAX,%X", d);
 		break;
 
+	case 0xAA:	// STOS Yb,AL
+		sprintf(ret, "STOS BYTE PTR [EDI],AL");
+		break;
+
+	case 0xAB:	// STOS Yv,EAX
+		sprintf(ret, "STOS BYTE PTR [EDI],EAX");
+		break;
+
+	case 0xAC:	// LODS AL,Xb
+		sprintf(ret, "LODS AL,BYTE PTR [ESI]");
+		break;
+
+	case 0xAD:	// LODS EAX,Xv
+		sprintf(ret, "LODS EAX,DWORD PTR [ESI]");
+		break;
+
+	case 0xAE:	// SCAS AL,Yb
+		sprintf(ret, "SCAS AL,BYTE PTR [EDI]");
+		break;
+
+	case 0xAF:	// SCAS EAX,Xv
+		sprintf(ret, "LODS EAX,DWORD PTR [ESI]");
+		break;
+
 	//TODO
 
 	case 0xC3:	// RETN
