@@ -845,6 +845,19 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "MOV %s,%X", opa1, b);
 		break;
 
+	case 0xB8:	// MOV EAX,Iv
+	case 0xB9:	// MOV ECX,Iv
+	case 0xBA:	// MOV EDX,Iv
+	case 0xBB:	// MOV EBX,Iv
+	case 0xBC:	// MOV ESP,Iv
+	case 0xBD:	// MOV EBP,Iv
+	case 0xBE:	// MOV ESI,Iv
+	case 0xBF:	// MOV EDI,Iv
+		opa1 = reg_table(b, 'd');
+		d = get_dword(fp);
+		sprintf(ret, "MOV %s,%X", opa1, d);
+		break;
+
 	//TODO
 
 	case 0xC3:	// RETN
