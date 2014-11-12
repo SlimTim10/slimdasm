@@ -482,20 +482,14 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	case 0x6A:	// PUSH Ib
 		b = fgetc(fp);
-		// Signed byte
-		if (b & 0x80) {
-			sprintf(ret, "PUSH -%X", ((~b)+1));
-		} else {
-			sprintf(ret, "PUSH %X", b);
-		}
-		break;
+		sprintf(ret, "PUSH %s", sign8x(b));
 
 	case 0x6B:	// IMUL Gv,Ev,Ib
 		b = fgetc(fp);
 		opa1 = parse_modrm(fp, b, 'G', 'd');
 		opa2 = parse_modrm(fp, b, 'E', 'd');
 		b = fgetc(fp);
-		sprintf(ret, "IMUL %s,%s,%X", opa1, opa2, b);
+		sprintf(ret, "IMUL %s,%s,%s", opa1, opa2, sign8x(b));
 		break;
 
 	case 0x6C:	// INS Yb,DX
@@ -618,7 +612,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		op = group1_op(get_regop(b));
 		opa1 = parse_modrm(fp, b, 'E', 'd');
 		b = fgetc(fp);
-		sprintf(ret, "%s %s,%X", op, opa1, b);
+		sprintf(ret, "%s %s,%s", op, opa1, sign8x(b));
 		break;
 
 	// Immediate Group 1
@@ -627,7 +621,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		op = group1_op(get_regop(b));
 		opa1 = parse_modrm(fp, b, 'E', 'd');
 		b = fgetc(fp);
-		sprintf(ret, "%s %s,%X", op, opa1, b);
+		sprintf(ret, "%s %s,%s", op, opa1, sign8x(b));
 		break;
 
 	case 0x84:	// TEST Eb,Gb
@@ -1327,7 +1321,7 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 				// sign-extended 8-bit displacement follows
 				b = fgetc(fp);
 				if (b & 0x80) {
-					sprintf(ret, "%s PTR [%s-%X]", size, reg_table(rm, 'd'), ((~b)+1));
+					sprintf(ret, "%s PTR [%s-%X]", size, reg_table(rm, 'd'), (BYTE) ((~b)+1));
 				} else {
 					sprintf(ret, "%s PTR [%s+%X]", size, reg_table(rm, 'd'), b);
 				}
@@ -1339,7 +1333,7 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 				// sign-extended 8-bit displacement follows
 				b = fgetc(fp);
 				if (b & 0x80) {
-					sprintf(ret, "%s PTR [%s-%X]", size, tmp, ((~b)+1));
+					sprintf(ret, "%s PTR [%s-%X]", size, tmp, (BYTE) ((~b)+1));
 				} else {
 					sprintf(ret, "%s PTR [%s+%X]", size, tmp, b);
 				}
@@ -1432,8 +1426,6 @@ char *reg_table(BYTE b, char bwd) {
 	// Only use 3 bits
 	b &= 7;
 
-	char *reg;
-
 	switch (bwd) {
 	case 'b':
 		switch (b) {
@@ -1523,8 +1515,6 @@ char *reg_table(BYTE b, char bwd) {
 		return "REGERR";
 		break;
 	}
-
-	return reg;
 }
 
 /* Return segment register corresponding to given byte, according to Table B-6 */

@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "utils.h"
 #include "defs.h"
@@ -18,6 +19,19 @@ DWORD lendian(BYTE *n, uint8_t count) {
 	for (i = 0; i < count; i++) {
 		shift = i * 8;
 		ret |= (n[i] << shift);
+	}
+
+	return ret;
+}
+
+/* Return a string of the signed hexadecimal value of a byte */
+char *sign8x(BYTE b) {
+	char *ret = (char *) malloc(4 * sizeof(char));	// Return string
+
+	if (b & 0x80) {
+		sprintf(ret, "-%X", (BYTE) ((~b)+1));
+	} else {
+		sprintf(ret, "%X", b);
 	}
 
 	return ret;
