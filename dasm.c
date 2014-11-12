@@ -407,7 +407,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0x4D:	// DEC EBP
 	case 0x4E:	// DEC ESI
 	case 0x4F:	// DEC EDI
-	 	sprintf(ret, "DEC %s", reg_table(b-7, 'd'));
+	 	sprintf(ret, "DEC %s", reg_table(b, 'd'));
 		break;
 
 	case 0x50:	// PUSH EAX
@@ -429,7 +429,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0x5D:	// POP EBP
 	case 0x5E:	// POP ESI
 	case 0x5F:	// POP EDI
-	 	sprintf(ret, "PUSH %s", reg_table(b-7, 'd'));
+	 	sprintf(ret, "POP %s", reg_table(b, 'd'));
 		break;
 
 	case 0x60:	// PUSHAD

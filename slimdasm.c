@@ -47,18 +47,21 @@ int main(int argc, char *argv[]) {
 	DWORD addr = pe->base + pe->rvacode;
 	BYTE *instr;
 	int i;
-	for (i = 0; i < 256; i++) {	// Only print the first 256 instructions (for testing)
-		len = ftell(fin);	// Get current position in stream
-		instr = parse_instr(fin, addr);	// Parse current instruction
-		printf("%.8X\t%s\n", addr, instr);
-		len = ftell(fin) - len;
-		addr += len;
-	}
 
-	/*  while (!feof(fin)) {
-		fgets(fbuf, 10, fin);
-		printf("%s", fbuf);
-		}*/
+	/* Start parsing and outputting 50 instructions at a time, waiting for user input after each block */
+	while (!feof(fin)) {
+		for (i = 0; i < 50; i++) {
+			len = ftell(fin);	// Get current position in stream
+			instr = parse_instr(fin, addr);	// Parse current instruction
+			printf("%.8X\t%s\n", addr, instr);
+			len = ftell(fin) - len;
+			addr += len;
+		}
+		char ch = getch();
+		if (ch == 'q') {
+			break;
+		}
+	}
 
 	free(fbuf);
 	free(pe);
