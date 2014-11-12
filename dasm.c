@@ -516,82 +516,82 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	case 0x70:	// JO SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JO SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JO SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x71:	// JNO SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JNO SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JNO SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x72:	// JB SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JB SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JB SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x73:	// JAE SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JAE SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JAE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x74:	// JE SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JE SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x75:	// JNE SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JNE SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JNE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x76:	// JBE SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JBE SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JBE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x77:	// JA SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JA SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JA SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x78:	// JS SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JS SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JS SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x79:	// JNS SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JNS SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JNS SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x7A:	// JP SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JP SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JP SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x7B:	// JNP SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JNP SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JNP SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x7C:	// JL SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JL SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JL SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x7D:	// JGE SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JGE SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JGE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x7E:	// JLE SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JLE SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JLE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x7F:	// JG SHORT
 		b = fgetc(fp);
-		sprintf(ret, "JG SHORT %X", curaddr + 2 + (signed char) b);
+		sprintf(ret, "JG SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	// Immediate Group 1
@@ -858,86 +858,315 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "MOV %s,%X", opa1, d);
 		break;
 
-	//TODO
+	// Shift Group 2
+	case 0xC0:	// Eb,Ib
+		b = fgetc(fp);
+		op = group2_op(get_regop(b));
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		b = fgetc(fp);
+		sprintf(ret, "%s %s,%X", op, opa1, b);
+		break;
+
+	// Shift Group 2
+	case 0xC1:	// Ev,Ib
+		b = fgetc(fp);
+		op = group2_op(get_regop(b));
+		opa1 = parse_modrm(fp, b, 'E', 'v');
+		b = fgetc(fp);
+		sprintf(ret, "%s %s,%X", op, opa1, b);
+		break;
+
+	case 0xC2:	// RETN Iw
+		w = get_word(fp);
+		sprintf(ret, "RETN %X", w);
+		break;
 
 	case 0xC3:	// RETN
 		sprintf(ret, "RETN");
 		break;
 
-	//TODO
+	case 0xC4:	// LES Gv,Mp
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "LES %s,%s", opa1, opa2);
+		break;
+
+	case 0xC5:	// LDS Gv,Mp
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "LDS %s,%s", opa1, opa2);
+		break;
+
+	// Group 11
+	case 0xC6:	// MOV Eb,Ib
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		b = fgetc(fp);
+		sprintf(ret, "MOV %s,%X", opa1, b);
+		break;
+
+	// Group 11
+	case 0xC7:	// MOV Ev,Iv
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		d = get_dword(fp);
+		sprintf(ret, "MOV %s,%X", opa1, d);
+		break;
+
+	case 0xC8:	// ENTER Iw,Ib
+		w = get_word(fp);
+		b = fgetc(fp);
+		sprintf(ret, "ENTER %X,%X", w, b);
+		break;
+
+	case 0xC9:	// LEAVE
+		sprintf(ret, "LEAVE");
+		break;
+
+	case 0xCA:	// RETF Iw
+		w = get_word(fp);
+		sprintf(ret, "RETF %X", w);
+		break;
+
+	case 0xCB:	// RETF
+		sprintf(ret, "RETF");
+		break;
 
 	case 0xCC:	// INT 3
 		sprintf(ret, "INT 3");
 		break;
 
-///OLD
-
-	case 0xC7:	/* C7 /0  MOV r/m32,imm32 */
-		b = fgetc(fp);		// Get ModR/M and opcode extension
-		mod = get_mod(b);
-		ext = get_regop(b);
-		if (ext == 0) {
-			if (mod == 0) {
-				b = fgetc(fp);		// Get SIB
-				tmp = sib_to_str(b);
-				sprintf(ret, "MOV DWORD PTR [%s],", tmp);
-				free(tmp);
-			} else if (mod == 1) {
-				b = fgetc(fp);		// Get SIB
-				tmp = sib_to_str(b);
-				b = fgetc(fp);		// Get displacement byte (signed)
-				if (b & 0x80) {
-					sprintf(ret, "MOV DWORD PTR [%s-%X],", tmp, (BYTE) ((~b) + 1));
-				} else {
-					sprintf(ret, "MOV DWORD PTR [%s+%X],", tmp, b);
-				}
-				free(tmp);
-			} else {
-				//TODO
-			}
-			/* Get second operand */
-			d = 0;
-			for (i = 0; i < 4; i++) {
-				b = fgetc(fp);
-				d |= (b << (i * 8));
-			}
-			sprintf(ret + strlen(ret), "%X", d);	// Append to string
-		} else {
-			ret = "OPCERR";
-		}
+	case 0xCD:	// INT Ib
+		b = fgetc(fp);
+		sprintf(ret, "INT %X", b);
 		break;
 
-	case 0xFF:	/* FF */
-		b = fgetc(fp);		// Get ModR/M and opcode extension
-		mod = get_mod(b);
-		ext = get_regop(b);
-		switch (ext) {
-			//TODO
-		case 2:	/* FF /2  CALL r/m32 */
-			switch(get_rm(b)) {
-			case 0:
-				//TODO
-				break;
-			case 5:
-				d = get_dword(fp);
-				sprintf(ret, "CALL DWORD PTR [%X]", d);
-				break;
-			case 6:
-				//TODO
-				break;
-			}
-			break;
-		default:
-			ret = "OPCERR";
-			break;
-		}
+	case 0xCE:	// INTO
+		sprintf(ret, "INTO");
 		break;
 
-	default:
-		ret = "OPCERR";
+	case 0xCF:	// IRET
+		sprintf(ret, "IRET");
 		break;
+
+	// Shift Group 2
+	case 0xD0:	// Eb,1
+		b = fgetc(fp);
+		op = group2_op(get_regop(b));
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		sprintf(ret, "%s %s,1", op, opa1);
+		break;
+
+	// Shift Group 2
+	case 0xD1:	// Ev,1
+		b = fgetc(fp);
+		op = group2_op(get_regop(b));
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "%s %s,1", op, opa1);
+		break;
+
+	// Shift Group 2
+	case 0xD2:	// Eb,CL
+		b = fgetc(fp);
+		op = group2_op(get_regop(b));
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		sprintf(ret, "%s %s,CL", op, opa1);
+		break;
+
+	// Shift Group 2
+	case 0xD3:	// Ev,CL
+		b = fgetc(fp);
+		op = group2_op(get_regop(b));
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "%s %s,CL", op, opa1);
+		break;
+
+	case 0xD4:	// AAM Ib
+		b = fgetc(fp);
+		sprintf(ret, "AAM %X", b);
+		break;
+
+	case 0xD5:	// AAD Ib
+		b = fgetc(fp);
+		sprintf(ret, "AAD %X", b);
+		break;
+
+	case 0xD6:	// None
+		sprintf(ret, "OPCERR");
+		break;
+
+	case 0xD7:	// XLAT
+		sprintf(ret, "XLAT");
+		break;
+
+	// ESC
+	case 0xD8:
+	case 0xD9:
+	case 0xDA:
+	case 0xDB:
+	case 0xDC:
+	case 0xDD:
+	case 0xDE:
+	case 0xDF:
+		//TODO
+		break;
+
+	case 0xE0:	// LOOPNE Jb
+		b = fgetc(fp);
+		sprintf(ret, "LOOPNE SHORT %X", curaddr + 2 + (int8_t) b);
+		break;
+
+	case 0xE1:	// LOOPE Jb
+		b = fgetc(fp);
+		sprintf(ret, "LOOPE SHORT %X", curaddr + 2 + (int8_t) b);
+		break;
+
+	case 0xE2:	// LOOP Jb
+		b = fgetc(fp);
+		sprintf(ret, "LOOP SHORT %X", curaddr + 2 + (int8_t) b);
+		break;
+
+	case 0xE3:	// JECXZ Jb
+		b = fgetc(fp);
+		sprintf(ret, "JECXZ SHORT %X", curaddr + 2 + (int8_t) b);
+		break;
+
+	case 0xE4:	// IN AL,Ib
+		b = fgetc(fp);
+		sprintf(ret, "IN AL,%X", b);
+		break;
+
+	case 0xE5:	// IN EAX,Ib
+		b = fgetc(fp);
+		sprintf(ret, "IN EAX,%X", b);
+		break;
+
+	case 0xE6:	// OUT Ib,AL
+		b = fgetc(fp);
+		sprintf(ret, "OUT %X,AL", b);
+		break;
+
+	case 0xE7:	// OUT Ib,EAX
+		b = fgetc(fp);
+		sprintf(ret, "OUT %X,EAX", b);
+		break;
+
+	case 0xE8:	// CALL Jv
+		d = get_dword(fp);
+		sprintf(ret, "CALL %X", curaddr + 2 + (int32_t) d);
+		break;
+
+	case 0xE9:	// JMP NEAR Jv
+		d = get_dword(fp);
+		sprintf(ret, "JMP NEAR %X", curaddr + 2 + (int32_t) d);
+		break;
+
+	case 0xEA:	// JMP FAR Ap
+		d = get_dword(fp);
+		w = get_word(fp);
+		sprintf(ret, "JMP FAR %X:%X", w, d);
+		break;
+
+	case 0xEB:	// JMP SHORT Jb
+		b = fgetc(fp);
+		sprintf(ret, "JMP SHORT %X", curaddr + 2 + (int8_t) b);
+		break;
+
+	case 0xEC:	// INT AL,DX
+		sprintf(ret, "INT AL,DX");
+		break;
+
+	case 0xED:	// INT EAX,DX
+		sprintf(ret, "INT EAX,DX");
+		break;
+
+	case 0xEE:	// OUT DX,AL
+		sprintf(ret, "OUT DX,AL");
+		break;
+
+	case 0xEF:	// OUT DX,EAX
+		sprintf(ret, "OUT DX,EAX");
+		break;
+
+	case 0xF0:	// LOCK
+		sprintf(ret, "LOCK");
+		break;
+
+	case 0xF1:	// None
+		sprintf(ret, "OPCERR");
+		break;
+
+	case 0xF2:	// REPNE
+		sprintf(ret, "REPNE");
+		break;
+
+	case 0xF3:	// REP
+		sprintf(ret, "REP");
+		break;
+
+	case 0xF4:	// HLT
+		sprintf(ret, "HLT");
+		break;
+
+	case 0xF5:	// CMC
+		sprintf(ret, "CMC");
+		break;
+
+	// Unary Group 3
+	case 0xF6:	// Eb
+		//TODO
+		break;
+
+	// Unary Group 3
+	case 0xF7:	// Ev
+		//TODO
+		break;
+
+	case 0xF8:	// CLC
+		sprintf(ret, "CLC");
+		break;
+
+	case 0xF9:	// STC
+		sprintf(ret, "STC");
+		break;
+
+	case 0xFA:	// CLI
+		sprintf(ret, "CLI");
+		break;
+
+	case 0xFB:	// STI
+		sprintf(ret, "STI");
+		break;
+
+	case 0xFC:	// CLD
+		sprintf(ret, "CLD");
+		break;
+
+	case 0xFD:	// STD
+		sprintf(ret, "STD");
+		break;
+
+	case 0xFE:	// INC/DEC Group 4
+		//TODO
+		break;
+
+	case 0xFF:	// INC/DEC Group 5
+		//TODO
+		/* b = fgetc(fp); */
+		/* op = group5_op(get_regop(b)); */
+		/* opa1 = parse_modrm(fp, b, 'E', 'd'); */
+		/* sprintf(ret, "%s %s,CL", op, opa1); */
+		break;
+
+	default:	// Unrecognized instruction
+		sprintf(ret, "OPCERR");
+		break;
+
 	}
 
+	free(op);
 	free(opa1);
 	free(opa2);
 
@@ -1281,6 +1510,36 @@ char *group1_op(BYTE op) {
 		break;
 	case 7:
 		return "CMP";
+		break;
+	default:
+		return "REGERR";
+		break;
+	}
+}
+
+/* Return string of corresponding opcode for Group 2, according to Table A-6 */
+char *group2_op(BYTE op) {
+	switch (op) {
+	case 0:
+		return "ROL";
+		break;
+	case 1:
+		return "ROR";
+		break;
+	case 2:
+		return "RCL";
+		break;
+	case 3:
+		return "RCR";
+		break;
+	case 4:
+		return "SHL";
+		break;
+	case 5:
+		return "SHR";
+		break;
+	case 7:
+		return "SAR";
 		break;
 	default:
 		return "REGERR";

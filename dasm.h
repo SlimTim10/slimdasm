@@ -15,5 +15,6 @@ char *reg_table(BYTE, char);
 char *segreg_table(BYTE);
 char *sib_to_str(BYTE);
 char *group1_op(BYTE);
+char *group2_op(BYTE);
 
 #endif
