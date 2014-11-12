@@ -23,8 +23,8 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	DWORD d;
 	int i;
 
-	///TEST show first byte of instruction
-	printf("%.2X\t", b);
+	// DEBUGGING show first byte of instruction
+	//	printf("%.2X\t", b);
 
 	switch (b) {
 
@@ -1055,12 +1055,12 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	case 0xE8:	// CALL Jv
 		d = get_dword(fp);
-		sprintf(ret, "CALL %X", curaddr + 2 + (int32_t) d);
+		sprintf(ret, "CALL %X", curaddr + 5 + (int32_t) d);
 		break;
 
 	case 0xE9:	// JMP NEAR Jv
 		d = get_dword(fp);
-		sprintf(ret, "JMP NEAR %X", curaddr + 2 + (int32_t) d);
+		sprintf(ret, "JMP NEAR %X", curaddr + 5 + (int32_t) d);
 		break;
 
 	case 0xEA:	// JMP FAR Ap
@@ -1116,12 +1116,70 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	// Unary Group 3
 	case 0xF6:	// Eb
-		//TODO
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		switch (get_regop(b)) {
+		case 0:
+			op = "TEST";
+			b = fgetc(fp);
+			sprintf(ret, "TEST %s,%X", opa1, b);
+			break;
+		case 2:
+			sprintf(ret, "NOT %s", opa1);
+			break;
+		case 3:
+			sprintf(ret, "NEG %s", opa1);
+			break;
+		case 4:
+			sprintf(ret, "MUL %s", opa1);
+			break;
+		case 5:
+			sprintf(ret, "IMUL %s", opa1);
+			break;
+		case 6:
+			sprintf(ret, "DIV %s", opa1);
+			break;
+		case 7:
+			sprintf(ret, "IDIV %s", opa1);
+			break;
+		default:
+			op = "OPCERR";
+			break;
+		}
 		break;
 
 	// Unary Group 3
 	case 0xF7:	// Ev
-		//TODO
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		switch (get_regop(b)) {
+		case 0:
+			op = "TEST";
+			d = get_dword(fp);
+			sprintf(ret, "TEST %s,%X", opa1, d);
+			break;
+		case 2:
+			sprintf(ret, "NOT %s", opa1);
+			break;
+		case 3:
+			sprintf(ret, "NEG %s", opa1);
+			break;
+		case 4:
+			sprintf(ret, "MUL %s", opa1);
+			break;
+		case 5:
+			sprintf(ret, "IMUL %s", opa1);
+			break;
+		case 6:
+			sprintf(ret, "DIV %s", opa1);
+			break;
+		case 7:
+			sprintf(ret, "IDIV %s", opa1);
+			break;
+		default:
+			op = "OPCERR";
+			break;
+		}
 		break;
 
 	case 0xF8:	// CLC
@@ -1149,15 +1207,52 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xFE:	// INC/DEC Group 4
-		//TODO
+		b = fgetc(fp);
+		switch (get_regop(b)) {
+		case 0:
+			op = "INC";
+			break;
+		case 1:
+			op = "DEC";
+			break;
+		default:
+			op = "OPCERR";
+			break;
+		}
+		opa1 = parse_modrm(fp, b, 'E', 'b');
+		sprintf(ret, "%s %s", op, opa1);
 		break;
 
 	case 0xFF:	// INC/DEC Group 5
-		//TODO
-		/* b = fgetc(fp); */
-		/* op = group5_op(get_regop(b)); */
-		/* opa1 = parse_modrm(fp, b, 'E', 'd'); */
-		/* sprintf(ret, "%s %s,CL", op, opa1); */
+		b = fgetc(fp);
+		switch (get_regop(b)) {
+		case 0:
+			op = "INC";
+			break;
+		case 1:
+			op = "DEC";
+			break;
+		case 2:
+			op = "CALL";
+			break;
+		case 3:
+			op = "CALL FAR";
+			break;
+		case 4:
+			op = "JMP";
+			break;
+		case 5:
+			op = "JMP FAR";
+			break;
+		case 6:
+			op = "PUSH";
+			break;
+		default:
+			op = "OPCERR";
+			break;
+		}
+		opa1 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "%s %s", op, opa1);
 		break;
 
 	default:	// Unrecognized instruction
