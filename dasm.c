@@ -483,6 +483,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0x6A:	// PUSH Ib
 		b = fgetc(fp);
 		sprintf(ret, "PUSH %s", sign8x(b));
+		break;
 
 	case 0x6B:	// IMUL Gv,Ev,Ib
 		b = fgetc(fp);
