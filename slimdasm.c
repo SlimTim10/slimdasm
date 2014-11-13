@@ -107,26 +107,6 @@ int main(int argc, char *argv[]) {
 			case KEY_PGDN:	// Next 50 instructions
 				print_ninstr(fin, &addr, 50);
 				break;
-			/* case KEY_UP: {	// Previous instruction */
-			/* 	DWORD curaddr = addr; */
-			/* 	DWORD curpos = ftell(fin);	// Get current position in stream */
-			/* 	DWORD pos = curpos; */
-			/* 	printf("curaddr: %.8X\tcurpos: %.8X\n", curaddr, curpos);	// Debugging */
-			/* 	do { */
-			/* 		printf("addr: %.8X\tpos: %.8X\n", addr, pos);	// Debugging */
-			/* 		addr--; */
-			/* 		pos--; */
-			/* 		fseek(fin, pos, SEEK_SET); */
-			/* 		parse_instr(fin, addr); */
-			/* 		printf("addr: %.8X\tftell: %.8X\n", addr, ftell(fin));	// Debugging */
-			/* 		getch(); */
-			/* 	} while (ftell(fin) >= curpos); */
-			/* 	fseek(fin, pos, SEEK_SET); */
-			/* 	printf("%.8X\t%s\n", addr, parse_instr(fin, addr));	// Parse and print instruction */
-			/* 	addr += (ftell(fin) - pos); */
-			/* 	printf("addr: %.8X\tftell: %.8X\n", addr, ftell(fin));	// Debugging */
-			/* 	break; */
-			/* } */
 			case KEY_HOME:	// Go back to OEP
 				printf("\r \n");	// Clear line
 				printf("EP RVA: %.8X\n", pe->rvaep);
