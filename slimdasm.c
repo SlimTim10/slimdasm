@@ -66,10 +66,10 @@ int main(int argc, char *argv[]) {
 			quit = 1;
 			break;
 		case 'n':	// Next instruction
-			print_instr(fin, &addr);
+			print_instr(fin, pe, &addr);
 			break;
 		case ' ':	// Next 50 instructions
-			print_ninstr(fin, &addr, 50);
+			print_ninstr(fin, pe, &addr, 50);
 			break;
 		case 'o':	// Go back to OEP
 			printf("\r \n");	// Clear line
@@ -88,10 +88,23 @@ int main(int argc, char *argv[]) {
 			printf("\r \nGo to address: ");
 			char getaddr[32];
 			fgets(getaddr, sizeof(getaddr), stdin);
+			addr = strtol(getaddr, NULL, 16);	// Parse input address
+			if (!valid_addr(pe, addr)) {	// Check bounds
+				printf("Address out of bounds\n");
+				break;
+			}
+			fseek(fin, addr - oep + codeoffset, SEEK_SET);
+			print_instr(fin, pe, &addr);	// Print the first instruction
+			break;
+		}
+		case 'f': {	// Follow instruction at specific address
+			printf("\r \nAddress of instruction to follow: ");
+			char getaddr[32];
+			fgets(getaddr, sizeof(getaddr), stdin);
 			//TODO check bounds
 			addr = strtol(getaddr, NULL, 16);
 			fseek(fin, addr - oep + codeoffset, SEEK_SET);
-			print_instr(fin, &addr);	// Print the first instruction
+			print_instr(fin, pe, &addr);	// Print the first instruction
 			break;
 		}
 		case 'h':	// Show help
@@ -102,10 +115,10 @@ int main(int argc, char *argv[]) {
 			ch = _getch();
 			switch (ch) {
 			case KEY_DOWN:	// Next instruction
-				print_instr(fin, &addr);
+				print_instr(fin, pe, &addr);
 				break;
 			case KEY_PGDN:	// Next 50 instructions
-				print_ninstr(fin, &addr, 50);
+				print_ninstr(fin, pe, &addr, 50);
 				break;
 			case KEY_HOME:	// Go back to OEP
 				printf("\r \n");	// Clear line
@@ -120,16 +133,6 @@ int main(int argc, char *argv[]) {
 				fseek(fin, codeoffset, SEEK_SET);
 				addr = oep;
 				break;
-			case KEY_RIGHT: {	// Go to specific address
-				printf("\r \nGo to address: ");
-				char getaddr[32];
-				fgets(getaddr, sizeof(getaddr), stdin);
-				//TODO check bounds
-				addr = strtol(getaddr, NULL, 16);
-				fseek(fin, addr - oep + codeoffset, SEEK_SET);
-				print_instr(fin, &addr);	// Print the first instruction
-				break;
-			}
 			default:
 				printf("0x%X\n", ch);	// Debugging
 				break;

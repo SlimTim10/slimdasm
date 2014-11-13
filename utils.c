@@ -4,6 +4,7 @@
 
 #include "utils.h"
 #include "defs.h"
+#include "pe.h"
 
 /* Return a DWORD of the little endian value of an array of length
    count (max 4) */
@@ -32,6 +33,18 @@ char *sign8x(BYTE b) {
 	}
 
 	return ret;
+}
+
+/* Return true iff the address is within the bounds of the code section */
+uint8_t valid_addr(PESTRUCT *pe, DWORD addr) {
+	DWORD minaddr = pe->base;
+	DWORD maxaddr = pe->base + pe->rvacode + pe->codesize;
+
+	if (addr < minaddr || addr > maxaddr) {
+		return 0;
+	} else {
+		return 1;
+	}
 }
 
 /* Print usage */
