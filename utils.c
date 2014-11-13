@@ -56,6 +56,47 @@ DWORD addr_to_offset(PESTRUCT *pe, DWORD addr) {
 	}
 }
 
+/* Parse and return the instruction at address addr */
+char *get_instr(FILE *fp, PESTRUCT *pe, DWORD addr) {
+	if (!valid_addr(pe, addr)) {
+		printf("Address out of bounds\n");
+		return;
+	}
+
+	DWORD curpos = addr_to_offset(pe, addr);	// Set current position in stream
+	fseek(fp, curpos, SEEK_SET);
+
+	return ((char *) parse_instr(fp, addr));
+}
+
+/* Return first address in instruction string as DWORD */
+/* Instruction must either be a jump (conditional or unconditional) or call */
+/* Looking for format:
+[JC].* (SHORT)? [0-9A-F]+
+ */
+DWORD parse_addr(char *instr) {
+	char c = *instr++;
+	if (!(c == 'J' || c == 'C')) {	// Mismatch
+		return 0;
+	}
+	while (*instr && c != ' ') {	// Skip to space
+		c = *instr++;
+	}
+	c = *instr++;
+	if (c == 'S') {	// "SHORT"
+		while (*instr && c != ' ') {	// Skip to space
+			c = *instr++;
+		}
+		c = *instr++;
+	}
+	if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')) {	// Start of address
+		*instr--;
+		return strtol(instr, NULL, 16);
+	} else {
+		return 0;	// Mismatch
+	}
+}
+
 /* Print usage */
 void usage(char *prog) {
 	fprintf(stderr, "usage: %s target\n", prog);

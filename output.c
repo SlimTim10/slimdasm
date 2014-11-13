@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "output.h"
 #include "defs.h"
@@ -21,9 +22,12 @@ void print_instr(FILE *fp, PESTRUCT *pe, DWORD *addr) {
 		printf("Address out of bounds\n");
 		return;
 	}
+
 	DWORD curpos = addr_to_offset(pe, *addr);	// Set current position in stream
 	fseek(fp, curpos, SEEK_SET);
-	printf("%.8X\t%s\n", *addr, parse_instr(fp, *addr));	// Parse and print instruction
+	char *str = (char *) parse_instr(fp, *addr);
+	printf("%.8X\t%s\n", *addr, str);	// Parse and print instruction
+	free(str);
 	*addr += (ftell(fp) - curpos);	// Update address
 }
 

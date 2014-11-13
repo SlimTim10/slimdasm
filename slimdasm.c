@@ -94,13 +94,15 @@ int main(int argc, char *argv[]) {
 		}
 		case 'f': {	// Follow instruction at specific address
 			printf("\r \nAddress of instruction to follow: ");
-			char getaddr[32];
-			fgets(getaddr, sizeof(getaddr), stdin);
-			addr = strtol(getaddr, NULL, 16);
-			print_instr(fin, pe, &addr);	// Print instruction to follow
+			char addrstr[32];
+			fgets(addrstr, sizeof(addrstr), stdin);
+			addr = strtol(addrstr, NULL, 16);
+			char *instr = get_instr(fin, pe, addr);
+			printf("%.8X\t%s\n", addr, instr);	// Print instruction to follow
 			printf("\t\tv\n");
-			parse_addr()
-			print_instr(fin, pe, &addr);	// Print instruction to follow
+			addr = parse_addr(instr);
+			print_instr(fin, pe, &addr);
+			free(instr);
 			break;
 		}
 		case 'h':	// Show help
