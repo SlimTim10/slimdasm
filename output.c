@@ -38,3 +38,9 @@ void print_ninstr(FILE *fp, PESTRUCT *pe, DWORD *addr, int n) {
 		print_instr(fp, pe, addr);
 	}
 }
+
+/* Print usage */
+void usage(char *prog) {
+	fprintf(stderr, "usage: %s target\n", prog);
+	exit(1);
+}

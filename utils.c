@@ -96,9 +96,3 @@ DWORD parse_addr(char *instr) {
 		return 0;	// Mismatch
 	}
 }
-
-/* Print usage */
-void usage(char *prog) {
-	fprintf(stderr, "usage: %s target\n", prog);
-	exit(1);
-}
