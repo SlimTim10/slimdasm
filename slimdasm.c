@@ -65,8 +65,37 @@ int main(int argc, char *argv[]) {
 		case 'q':
 			quit = 1;
 			break;
-		case '?':	// Show help
-		case 'h':
+		case 'n':	// Next instruction
+			print_instr(fin, &addr);
+			break;
+		case ' ':	// Next 50 instructions
+			print_ninstr(fin, &addr, 50);
+			break;
+		case 'o':	// Go back to OEP
+			printf("\r \n");	// Clear line
+			printf("EP RVA: %.8X\n", pe->rvaep);
+			printf("Code section RVA: %.8X\n", pe->rvacode);
+			printf("Data section RVA: %.8X\n", pe->rvadata);
+			printf("Image base: %.8X\n", pe->base);
+			printf("Size of code section: %.8X\n", pe->codesize);
+			printf("Code section offset: %.8X\n", codeoffset);
+			printf("OEP address: %.8X\n", oep);
+			printf("\n");
+			fseek(fin, codeoffset, SEEK_SET);
+			addr = oep;
+			break;
+		case 'g': {	// Go to specific address
+			printf("\r \nGo to address: ");
+			char getaddr[32];
+			fgets(getaddr, sizeof(getaddr), stdin);
+			//TODO check bounds
+			addr = strtol(getaddr, NULL, 16);
+			fseek(fin, addr - oep + codeoffset, SEEK_SET);
+			print_instr(fin, &addr);	// Print the first instruction
+			break;
+		}
+		case 'h':	// Show help
+		case '?':
 			print_help();
 			break;
 		case SPECIAL_KEY:
@@ -78,13 +107,49 @@ int main(int argc, char *argv[]) {
 			case KEY_PGDN:	// Next 50 instructions
 				print_ninstr(fin, &addr, 50);
 				break;
+			/* case KEY_UP: {	// Previous instruction */
+			/* 	DWORD curaddr = addr; */
+			/* 	DWORD curpos = ftell(fin);	// Get current position in stream */
+			/* 	DWORD pos = curpos; */
+			/* 	printf("curaddr: %.8X\tcurpos: %.8X\n", curaddr, curpos);	// Debugging */
+			/* 	do { */
+			/* 		printf("addr: %.8X\tpos: %.8X\n", addr, pos);	// Debugging */
+			/* 		addr--; */
+			/* 		pos--; */
+			/* 		fseek(fin, pos, SEEK_SET); */
+			/* 		parse_instr(fin, addr); */
+			/* 		printf("addr: %.8X\tftell: %.8X\n", addr, ftell(fin));	// Debugging */
+			/* 		getch(); */
+			/* 	} while (ftell(fin) >= curpos); */
+			/* 	fseek(fin, pos, SEEK_SET); */
+			/* 	printf("%.8X\t%s\n", addr, parse_instr(fin, addr));	// Parse and print instruction */
+			/* 	addr += (ftell(fin) - pos); */
+			/* 	printf("addr: %.8X\tftell: %.8X\n", addr, ftell(fin));	// Debugging */
+			/* 	break; */
+			/* } */
 			case KEY_HOME:	// Go back to OEP
 				printf("\r \n");	// Clear line
+				printf("EP RVA: %.8X\n", pe->rvaep);
+				printf("Code section RVA: %.8X\n", pe->rvacode);
+				printf("Data section RVA: %.8X\n", pe->rvadata);
+				printf("Image base: %.8X\n", pe->base);
+				printf("Size of code section: %.8X\n", pe->codesize);
+				printf("Code section offset: %.8X\n", codeoffset);
+				printf("OEP address: %.8X\n", oep);
+				printf("\n");
 				fseek(fin, codeoffset, SEEK_SET);
 				addr = oep;
-				/* Print the first instruction */
-				print_instr(fin, &addr);
 				break;
+			case KEY_RIGHT: {	// Go to specific address
+				printf("\r \nGo to address: ");
+				char getaddr[32];
+				fgets(getaddr, sizeof(getaddr), stdin);
+				//TODO check bounds
+				addr = strtol(getaddr, NULL, 16);
+				fseek(fin, addr - oep + codeoffset, SEEK_SET);
+				print_instr(fin, &addr);	// Print the first instruction
+				break;
+			}
 			default:
 				printf("0x%X\n", ch);	// Debugging
 				break;

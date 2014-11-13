@@ -7,6 +7,7 @@ enum single_scans {
 
 enum special_scans {
 	SPECIAL_KEY = 0xE0,	// Special key prefix for following scan codes
+	KEY_RIGHT = 0x4D,
 	KEY_PGDN = 0x51,
 	KEY_DOWN = 0x50,
 	KEY_PGUP = 0x49,
