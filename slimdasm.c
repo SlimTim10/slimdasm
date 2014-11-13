@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 		case 'n':	// Next instruction
 			print_instr(fin, pe, &addr);
 			break;
-		case ' ':	// Next 50 instructions
+		case ' ':	// Next 32 instructions
 			print_ninstr(fin, pe, &addr, 50);
 			break;
 		case 'o':	// Go back to OEP
@@ -89,11 +89,6 @@ int main(int argc, char *argv[]) {
 			char getaddr[32];
 			fgets(getaddr, sizeof(getaddr), stdin);
 			addr = strtol(getaddr, NULL, 16);	// Parse input address
-			if (!valid_addr(pe, addr)) {	// Check bounds
-				printf("Address out of bounds\n");
-				break;
-			}
-			fseek(fin, addr - pe->oep + pe->codeoffset, SEEK_SET);
 			print_instr(fin, pe, &addr);	// Print the first instruction
 			break;
 		}
@@ -102,12 +97,10 @@ int main(int argc, char *argv[]) {
 			char getaddr[32];
 			fgets(getaddr, sizeof(getaddr), stdin);
 			addr = strtol(getaddr, NULL, 16);
-			if (!valid_addr(pe, addr)) {	// Check bounds
-				printf("Address out of bounds\n");
-				break;
-			}
-			fseek(fin, addr - pe->oep + pe->codeoffset, SEEK_SET);
-			print_instr(fin, pe, &addr);	// Print the first instruction
+			print_instr(fin, pe, &addr);	// Print instruction to follow
+			printf("\t\tv\n");
+			parse_addr()
+			print_instr(fin, pe, &addr);	// Print instruction to follow
 			break;
 		}
 		case 'h':	// Show help
@@ -120,7 +113,7 @@ int main(int argc, char *argv[]) {
 			case KEY_DOWN:	// Next instruction
 				print_instr(fin, pe, &addr);
 				break;
-			case KEY_PGDN:	// Next 50 instructions
+			case KEY_PGDN:	// Next 32 instructions
 				print_ninstr(fin, pe, &addr, 50);
 				break;
 			case KEY_HOME:	// Go back to OEP
