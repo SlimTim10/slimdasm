@@ -1,5 +1,5 @@
-#ifndef _PELIB_H
-#define _PELIB_H
+#ifndef _PE_H
+#define _PE_H
 
 #include <stdio.h>
 

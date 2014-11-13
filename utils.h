@@ -1,5 +1,5 @@
-#ifndef _UTILSLIB_H
-#define _UTILSLIB_H
+#ifndef _UTILS_H
+#define _UTILS_H
 
 #include "defs.h"
 

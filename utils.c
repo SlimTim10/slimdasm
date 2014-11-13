@@ -1,6 +1,3 @@
-#ifndef _UTILSLIB_C
-#define _UTILSLIB_C
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,5 +39,3 @@ void usage(char *prog) {
 	fprintf(stderr, "usage: %s target\n", prog);
 	exit(1);
 }
-
-#endif

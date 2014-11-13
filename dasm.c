@@ -1,6 +1,3 @@
-#ifndef _DASMLIB_C
-#define _DASMLIB_C
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1632,5 +1629,3 @@ char *group2_op(BYTE op) {
 		break;
 	}
 }
-
-#endif

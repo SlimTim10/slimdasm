@@ -1,5 +1,5 @@
-#ifndef _DASMLIB_H
-#define _DASMLIB_H
+#ifndef _DASM_H
+#define _DASM_H
 
 #include "defs.h"
 

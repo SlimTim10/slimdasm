@@ -1,6 +1,3 @@
-#ifndef _PELIB_C
-#define _PELIB_C
-
 #include <stdio.h>
 
 #include "pe.h"
@@ -50,5 +47,3 @@ int parse_pe_header(PESTRUCT *p, FILE *fp, BYTE *buf) {
 
 	return 0;
 }
-
-#endif

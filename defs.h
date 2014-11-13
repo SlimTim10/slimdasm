@@ -1,5 +1,5 @@
-#ifndef _DEFSLIB_H
-#define _DEFSLIB_H
+#ifndef _DEFS_H
+#define _DEFS_H
 
 #include <stdint.h>
 
