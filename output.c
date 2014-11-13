@@ -16,19 +16,20 @@ void print_help(void) {
 
 /* Parse and print the instruction at address addr, then point addr to the following instruction */
 void print_instr(FILE *fp, PESTRUCT *pe, DWORD *addr) {
-	DWORD curpos = ftell(fp);	// Get current position in stream
 	if (!valid_addr(pe, *addr)) {
 		printf("ERROR: Address out of bounds\n");
 		return;
 	}
+	DWORD curpos = addr_to_offset(pe, *addr);	// Set current position in stream
+	fseek(fp, curpos, SEEK_SET);
 	printf("%.8X\t%s\n", *addr, parse_instr(fp, *addr));	// Parse and print instruction
 	*addr += (ftell(fp) - curpos);
 }
 
-/* Parse and print the next n instructions, starting at address addr, then point addr to the following instruction */
-void print_ninstr(FILE *fp, PESTRUCT *pe, DWORD *addr, int n) {
+/* Parse and print the next n instructions, given starting address, then point addr to the following instruction */
+void print_ninstr(FILE *fp, PESTRUCT *pe, DWORD *startaddr, int n) {
 	int i;
 	for (i = 0; i < n; i++) {
-		print_instr(fp, pe, addr);
+		print_instr(fp, pe, startaddr);
 	}
 }

@@ -9,21 +9,22 @@
 #include "output.h"
 
 int main(int argc, char *argv[]) {
-	FILE *fin;	// Global file pointer to input file for disassembly
-	BYTE *fbuf;
-	PESTRUCT *pe;
-
-	fbuf = (BYTE *) malloc(256 * sizeof(BYTE));
-	pe = (PESTRUCT *) malloc(sizeof(PESTRUCT));
-
 	if (argc < 2) {
 		usage(argv[0]);
 	}
+
+	FILE *fin;	// Input file for disassembly
 
 	if ((fin = fopen(argv[1], "rb")) == 0) {
 		fprintf(stderr, "Error: could not open file\n");
 		exit(1);
 	}
+
+	BYTE *fbuf;
+	PESTRUCT *pe;
+
+	fbuf = (BYTE *) malloc(256 * sizeof(BYTE));
+	pe = (PESTRUCT *) malloc(sizeof(PESTRUCT));
 
 	parse_pe_header(pe, fin, fbuf);
 
@@ -34,22 +35,21 @@ int main(int argc, char *argv[]) {
 	printf("Size of code section: %.8X\n", pe->codesize);
 
 	/* Get size of headers */
-	fseek(fin, (pe->offset + 84), SEEK_SET);
+	fseek(fin, pe->offset + 84, SEEK_SET);
 	fgets(fbuf, 4, fin);
 
-	DWORD codeoffset;
-	codeoffset = lendian(fbuf, 4);
-	printf("Code section offset: %.8X\n", codeoffset);
+	pe->codeoffset = lendian(fbuf, 4);
+	printf("Code section offset: %.8X\n", pe->codeoffset);
 
-	DWORD oep = pe->base + pe->rvacode;
-	printf("OEP address: %.8X\n", oep);
+	pe->oep = pe->base + pe->rvacode;
+	printf("OEP address: %.8X\n", pe->oep);
 
 	printf("\n");
 
-	fseek(fin, codeoffset, SEEK_SET);	// Go to start of code section
+	fseek(fin, pe->codeoffset, SEEK_SET);	// Go to start of code section
 
 	DWORD len;
-	DWORD addr = oep;	// First instruction at OEP
+	DWORD addr = pe->oep;	// First instruction at OEP
 	int i;
 	int quit = 0;
 
@@ -78,11 +78,11 @@ int main(int argc, char *argv[]) {
 			printf("Data section RVA: %.8X\n", pe->rvadata);
 			printf("Image base: %.8X\n", pe->base);
 			printf("Size of code section: %.8X\n", pe->codesize);
-			printf("Code section offset: %.8X\n", codeoffset);
-			printf("OEP address: %.8X\n", oep);
+			printf("Code section offset: %.8X\n", pe->codeoffset);
+			printf("OEP address: %.8X\n", pe->oep);
 			printf("\n");
-			fseek(fin, codeoffset, SEEK_SET);
-			addr = oep;
+			fseek(fin, pe->codeoffset, SEEK_SET);
+			addr = pe->oep;
 			break;
 		case 'g': {	// Go to specific address
 			printf("\r \nGo to address: ");
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
 				printf("Address out of bounds\n");
 				break;
 			}
-			fseek(fin, addr - oep + codeoffset, SEEK_SET);
+			fseek(fin, addr - pe->oep + pe->codeoffset, SEEK_SET);
 			print_instr(fin, pe, &addr);	// Print the first instruction
 			break;
 		}
@@ -101,9 +101,12 @@ int main(int argc, char *argv[]) {
 			printf("\r \nAddress of instruction to follow: ");
 			char getaddr[32];
 			fgets(getaddr, sizeof(getaddr), stdin);
-			//TODO check bounds
 			addr = strtol(getaddr, NULL, 16);
-			fseek(fin, addr - oep + codeoffset, SEEK_SET);
+			if (!valid_addr(pe, addr)) {	// Check bounds
+				printf("Address out of bounds\n");
+				break;
+			}
+			fseek(fin, addr - pe->oep + pe->codeoffset, SEEK_SET);
 			print_instr(fin, pe, &addr);	// Print the first instruction
 			break;
 		}
@@ -127,11 +130,11 @@ int main(int argc, char *argv[]) {
 				printf("Data section RVA: %.8X\n", pe->rvadata);
 				printf("Image base: %.8X\n", pe->base);
 				printf("Size of code section: %.8X\n", pe->codesize);
-				printf("Code section offset: %.8X\n", codeoffset);
-				printf("OEP address: %.8X\n", oep);
+				printf("Code section offset: %.8X\n", pe->codeoffset);
+				printf("OEP address: %.8X\n", pe->oep);
 				printf("\n");
-				fseek(fin, codeoffset, SEEK_SET);
-				addr = oep;
+				fseek(fin, pe->codeoffset, SEEK_SET);
+				addr = pe->oep;
 				break;
 			default:
 				printf("0x%X\n", ch);	// Debugging

@@ -47,6 +47,11 @@ uint8_t valid_addr(PESTRUCT *pe, DWORD addr) {
 	}
 }
 
+/* Return address converted to offset */
+DWORD addr_to_offset(PESTRUCT *pe, DWORD addr) {
+	return (addr - pe->oep + pe->codeoffset);
+}
+
 /* Print usage */
 void usage(char *prog) {
 	fprintf(stderr, "usage: %s target\n", prog);
