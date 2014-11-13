@@ -3,6 +3,15 @@
 #include "output.h"
 #include "defs.h"
 
+void print_help(void) {
+	printf("\r \n");	// Clear line
+	printf("esc-Quit\n");
+	printf("down-Next instruction\tpgdn-Next 50 instructions\n");
+	printf("up-Prev instruction\tpgup-Prev 50 instructions\n");
+	printf("home-Go to OEP\n");
+	printf("?-Show help\n\n");
+}
+
 /* Parse and print the instruction at address addr, then point addr to the following instruction */
 void print_instr(FILE *fp, DWORD *addr) {
 	DWORD curpos = ftell(fp);	// Get current position in stream

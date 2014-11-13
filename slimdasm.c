@@ -41,12 +41,15 @@ int main(int argc, char *argv[]) {
 	codeoffset = lendian(fbuf, 4);
 	printf("Code section offset: %.8X\n", codeoffset);
 
+	DWORD oep = pe->base + pe->rvacode;
+	printf("OEP address: %.8X\n", oep);
+
 	printf("\n");
 
 	fseek(fin, codeoffset, SEEK_SET);	// Go to start of code section
 
 	DWORD len;
-	DWORD addr = pe->base + pe->rvacode;	// First instruction at EP
+	DWORD addr = oep;	// First instruction at OEP
 	int i;
 	int quit = 0;
 
@@ -56,11 +59,15 @@ int main(int argc, char *argv[]) {
 
 		/* Wait for user input */
 		int ch = _getch();
-		printf("\b");
+		printf("\b");	// Erase character
 		switch (ch) {
 		case KEY_ESC:	// Quit
 		case 'q':
 			quit = 1;
+			break;
+		case '?':	// Show help
+		case 'h':
+			print_help();
 			break;
 		case SPECIAL_KEY:
 			ch = _getch();
@@ -71,9 +78,10 @@ int main(int argc, char *argv[]) {
 			case KEY_PGDN:	// Next 50 instructions
 				print_ninstr(fin, &addr, 50);
 				break;
-			case KEY_HOME:	// Go back to EP
+			case KEY_HOME:	// Go back to OEP
+				printf("\r \n");	// Clear line
 				fseek(fin, codeoffset, SEEK_SET);
-				addr = pe->base + pe->rvacode;
+				addr = oep;
 				/* Print the first instruction */
 				print_instr(fin, &addr);
 				break;
