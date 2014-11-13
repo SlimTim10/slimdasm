@@ -6,3 +6,11 @@ Compile with GCC:
 gcc -o output/slimdasm.exe slimdasm.c utils.c pe.c dasm.c output.c
 
 usage: slimdasm target
+
+Interactive commands:
+q-Quit
+n-Next instruction      space-Next 32 instructions
+o-Go to OEP
+g-Go to address
+f-Follow instruction
+h-Show help
