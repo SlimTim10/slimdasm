@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "output.h"
 #include "defs.h"
 
 /* Parse and print the next instruction */
