@@ -5,6 +5,7 @@
 #include "pe.h"
 #include "utils.h"
 #include "dasm.h"
+#include "scan_codes.h"
 
 int main(int argc, char *argv[]) {
 	FILE *fin;	// Global file pointer to input file for disassembly
@@ -47,18 +48,47 @@ int main(int argc, char *argv[]) {
 	DWORD addr = pe->base + pe->rvacode;
 	BYTE *instr;
 	int i;
+	int quit = 0;
 
 	/* Start parsing and outputting 50 instructions at a time, waiting for user input after each block */
-	while (!feof(fin)) {
-		for (i = 0; i < 50; i++) {
-			len = ftell(fin);	// Get current position in stream
-			instr = parse_instr(fin, addr);	// Parse current instruction
-			printf("%.8X\t%s\n", addr, instr);
-			len = ftell(fin) - len;
-			addr += len;
-		}
-		char ch = getch();
-		if (ch == 'q') {
+	while (!feof(fin) && !quit) {
+		/* Wait for user input */
+		int ch = _getch();
+		switch (ch) {
+		case KEY_ESC:	// Quit
+		case 'q':
+			quit = 1;
+			break;
+		case SPECIAL_KEY:
+			ch = _getch();
+			switch (ch) {
+			case KEY_DOWN:	// Next instruction
+				len = ftell(fin);	// Get current position in stream
+				instr = parse_instr(fin, addr);	// Parse current instruction
+				printf("%.8X\t%s\n", addr, instr);
+				len = ftell(fin) - len;
+				addr += len;
+				break;
+			case KEY_PGDN:	// Next 50 instructions
+				for (i = 0; i < 50; i++) {
+					len = ftell(fin);	// Get current position in stream
+					instr = parse_instr(fin, addr);	// Parse current instruction
+					printf("%.8X\t%s\n", addr, instr);
+					len = ftell(fin) - len;
+					addr += len;
+				}
+				break;
+			case KEY_HOME:	// Go back to EP
+				fseek(fin, codeoffset, SEEK_SET);	// Go to start of code section
+				addr = pe->base + pe->rvacode;
+				break;
+			default:
+				printf("0x%X\n", ch);	// Debugging
+				break;
+			}
+			break;
+		default:
+			printf("0x%X\n", ch);	// Debugging
 			break;
 		}
 	}
