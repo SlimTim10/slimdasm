@@ -46,8 +46,7 @@ int main(int argc, char *argv[]) {
 	fseek(fin, codeoffset, SEEK_SET);	// Go to start of code section
 
 	DWORD len;
-	DWORD addr = pe->base + pe->rvacode;
-	BYTE *instr;
+	DWORD addr = pe->base + pe->rvacode;	// First instruction at EP
 	int i;
 	int quit = 0;
 
@@ -67,21 +66,16 @@ int main(int argc, char *argv[]) {
 			ch = _getch();
 			switch (ch) {
 			case KEY_DOWN:	// Next instruction
-				len = next_instr(fin, addr);
-				addr += len;
+				print_instr(fin, &addr);
 				break;
 			case KEY_PGDN:	// Next 50 instructions
-				for (i = 0; i < 50; i++) {
-					len = next_instr(fin, addr);
-					addr += len;
-				}
+				print_ninstr(fin, &addr, 50);
 				break;
 			case KEY_HOME:	// Go back to EP
 				fseek(fin, codeoffset, SEEK_SET);
 				addr = pe->base + pe->rvacode;
 				/* Print the first instruction */
-				len = next_instr(fin, addr);
-				addr += len;
+				print_instr(fin, &addr);
 				break;
 			default:
 				printf("0x%X\n", ch);	// Debugging
@@ -96,7 +90,6 @@ int main(int argc, char *argv[]) {
 
 	free(fbuf);
 	free(pe);
-	free(instr);
 
 	fclose(fin);
 

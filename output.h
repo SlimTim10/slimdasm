@@ -3,6 +3,7 @@
 
 #include "defs.h"
 
-DWORD next_instr(FILE *, DWORD);
+void print_instr(FILE *, DWORD *);
+void print_ninstr(FILE *, DWORD *, int);
 
 #endif
