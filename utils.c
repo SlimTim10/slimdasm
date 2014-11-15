@@ -36,7 +36,7 @@ char *sign8x(BYTE b) {
 }
 
 /* Return true iff the address is within the bounds of the code section */
-uint8_t valid_addr(PESTRUCT *pe, DWORD addr) {
+int valid_addr(PESTRUCT *pe, DWORD addr) {
 	DWORD minaddr = pe->base;
 	DWORD maxaddr = pe->base + pe->rvacode + pe->codesize;
 
