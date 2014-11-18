@@ -438,7 +438,10 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x62:	// BOUND Gv,Ma
-		//TODO
+		b = fgetc(fp);
+		opa1 = parse_modrm(fp, b, 'G', 'd');
+		opa2 = parse_modrm(fp, b, 'E', 'd');
+		sprintf(ret, "BOUND %s,%s", opa1, opa2);
 		break;
 
 	case 0x63:	// ARPL Ew,Gw
