@@ -49,7 +49,8 @@ int main(int argc, char *argv[]) {
 	fseek(fin, pe->codeoffset, SEEK_SET);	// Go to start of code section
 
 	DWORD len;
-	DWORD addr = pe->oep;	// First instruction at OEP
+	DWORD cur_addr = pe->oep;	// First instruction at OEP
+	DWORD addr;
 	int i;
 	int quit = 0;
 
@@ -66,10 +67,10 @@ int main(int argc, char *argv[]) {
 			quit = 1;
 			break;
 		case 'n':	// Next instruction
-			print_instr(fin, pe, &addr);
+			print_instr(fin, pe, &cur_addr);
 			break;
 		case ' ':	// Next 32 instructions
-			print_ninstr(fin, pe, &addr, 50);
+			print_ninstr(fin, pe, &cur_addr, 50);
 			break;
 		case 'o':	// Go back to OEP
 			printf("\r \n");	// Clear line
@@ -82,14 +83,15 @@ int main(int argc, char *argv[]) {
 			printf("OEP address: %.8X\n", pe->oep);
 			printf("\n");
 			fseek(fin, pe->codeoffset, SEEK_SET);
-			addr = pe->oep;
+			cur_addr = pe->oep;
 			break;
 		case 'g': {	// Go to specific address
 			printf("\r \nGo to address: ");
 			char getaddr[32];
 			fgets(getaddr, sizeof(getaddr), stdin);
 			addr = strtol(getaddr, NULL, 16);	// Parse input address
-			print_instr(fin, pe, &addr);	// Print the first instruction
+			if (!print_instr(fin, pe, &addr)) break;	// Print the first instruction
+			cur_addr = addr;
 			break;
 		}
 		case 'f': {	// Follow instruction at specific address
@@ -98,10 +100,12 @@ int main(int argc, char *argv[]) {
 			fgets(addrstr, sizeof(addrstr), stdin);
 			addr = strtol(addrstr, NULL, 16);
 			char *instr = get_instr(fin, pe, addr);
+			if (!instr) break;	// Error
 			printf("%.8X\t%s\n", addr, instr);	// Print instruction to follow
 			printf("\t\tv\n");
 			addr = parse_addr(instr);
-			print_instr(fin, pe, &addr);
+			if (!print_instr(fin, pe, &addr)) break;
+			cur_addr = addr;
 			free(instr);
 			break;
 		}
@@ -113,10 +117,10 @@ int main(int argc, char *argv[]) {
 			ch = _getch();
 			switch (ch) {
 			case KEY_DOWN:	// Next instruction
-				print_instr(fin, pe, &addr);
+				print_instr(fin, pe, &cur_addr);
 				break;
 			case KEY_PGDN:	// Next 32 instructions
-				print_ninstr(fin, pe, &addr, 50);
+				print_ninstr(fin, pe, &cur_addr, 50);
 				break;
 			case KEY_HOME:	// Go back to OEP
 				printf("\r \n");	// Clear line
@@ -129,7 +133,7 @@ int main(int argc, char *argv[]) {
 				printf("OEP address: %.8X\n", pe->oep);
 				printf("\n");
 				fseek(fin, pe->codeoffset, SEEK_SET);
-				addr = pe->oep;
+				cur_addr = pe->oep;
 				break;
 			default:
 				printf("0x%X\n", ch);	// Debugging

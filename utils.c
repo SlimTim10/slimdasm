@@ -59,7 +59,7 @@ DWORD addr_to_offset(PESTRUCT *pe, DWORD addr) {
 /* Parse and return the instruction at address addr */
 char *get_instr(FILE *fp, PESTRUCT *pe, DWORD addr) {
 	if (!valid_addr(pe, addr)) {
-		printf("Address out of bounds\n");
+		printf("Address out of bounds\n\n");
 		return;
 	}
 
