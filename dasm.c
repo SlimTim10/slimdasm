@@ -1124,12 +1124,178 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		}
 		break;
 
-	case 0xDB:
-	case 0xDC:
-	case 0xDD:
-	case 0xDE:
-	case 0xDF:
-		//TODO
+	case 0xDB:	// Escape code (A.2.6.6)
+		b = fgetc(fp);
+		if (b <= 0xBF) {
+			ext = get_regop(b);
+			switch (ext) {
+			case 0:
+				op = "FILD"; break;
+			case 1:
+				op = "OPCERR"; break;
+			case 2:
+				op = "FIST"; break;
+			case 3:
+				op = "FISTP"; break;
+			case 4:
+				op = "OPCERR"; break;
+			case 5:
+				op = "FLD"; break;
+			case 6:
+				op = "OPCERR"; break;
+			case 7:
+				op = "FSTP"; break;
+			}
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			sprintf(ret, "%s %s", op, opa1);
+		} else {
+			if (b >= 0xC0 && b <= 0xC7) sprintf(ret, "FCMOVNB ST(0),ST(%d)", (b & 7));
+			else if (b >= 0xC8 && b <= 0xCF) sprintf(ret, "FCMOVNE ST(0),ST(%d)", (b & 7));
+			else if (b >= 0xD0 && b <= 0xD7) sprintf(ret, "FCMOVNBE ST(0),ST(%d)", (b & 7));
+			else if (b >= 0xD8 && b <= 0xDF) sprintf(ret, "FCMOVNU ST(0),ST(%d)", (b & 7));
+			else if (b == 0xE2) sprintf(ret, "FCLEX");
+			else if (b == 0xE3) sprintf(ret, "FINIT");
+			else if (b >= 0xE8 && b <= 0xEF) sprintf(ret, "FUCOMI ST(0),ST(%d)", (b & 7));
+			else if (b >= 0xF0 && b <= 0xF7) sprintf(ret, "FCOMI ST(0),ST(%d)", (b & 7));
+			else sprintf(ret, "OPCERR");
+		}
+		break;
+
+	case 0xDC:	// Escape code (A.2.6.7)
+		b = fgetc(fp);
+		if (b <= 0xBF) {
+			ext = get_regop(b);
+			switch (ext) {
+			case 0:
+				op = "FADD"; break;
+			case 1:
+				op = "FMUL"; break;
+			case 2:
+				op = "FCOM"; break;
+			case 3:
+				op = "FCOMP"; break;
+			case 4:
+				op = "FSUB"; break;
+			case 5:
+				op = "FSUBR"; break;
+			case 6:
+				op = "FDIV"; break;
+			case 7:
+				op = "FDIVR"; break;
+			}
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			sprintf(ret, "%s %s", op, opa1);
+		} else {
+			if (b >= 0xC0 && b <= 0xC7) sprintf(ret, "FADD ST(%d),ST(0)", (b & 7));
+			else if (b >= 0xC8 && b <= 0xCF) sprintf(ret, "FMUL ST(%d),ST(0)", (b & 7));
+			else if (b >= 0xE0 && b <= 0xE7) sprintf(ret, "FSUBR ST(%d),ST(0)", (b & 7));
+			else if (b >= 0xE8 && b <= 0xEF) sprintf(ret, "FSUB ST(%d),ST(0)", (b & 7));
+			else if (b >= 0xF0 && b <= 0xF7) sprintf(ret, "FDIVR ST(%d),ST(0)", (b & 7));
+			else if (b >= 0xF8 && b <= 0xFF) sprintf(ret, "FDIV ST(%d),ST(0)", (b & 7));
+			else sprintf(ret, "OPCERR");
+		}
+		break;
+
+	case 0xDD:	// Escape code (A.2.6.8)
+		b = fgetc(fp);
+		if (b <= 0xBF) {
+			ext = get_regop(b);
+			switch (ext) {
+			case 0:
+				op = "FILD"; break;
+			case 1:
+				op = "OPCERR"; break;
+			case 2:
+				op = "FST"; break;
+			case 3:
+				op = "FSTP"; break;
+			case 4:
+				op = "FRSTOR"; break;
+			case 5:
+				op = "OPCERR"; break;
+			case 6:
+				op = "FSAVE"; break;
+			case 7:
+				op = "FSTSW"; break;
+			}
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			sprintf(ret, "%s %s", op, opa1);
+		} else {
+			if (b >= 0xC0 && b <= 0xC7) sprintf(ret, "FFREE ST(%d)", (b & 7));
+			else if (b >= 0xD0 && b <= 0xD7) sprintf(ret, "FST ST(%d)", (b & 7));
+			else if (b >= 0xD8 && b <= 0xDF) sprintf(ret, "FSTP ST(%d)", (b & 7));
+			else if (b >= 0xE0 && b <= 0xE7) sprintf(ret, "FUCOM ST(%d),ST(0)", (b & 7));
+			else if (b >= 0xE8 && b <= 0xEF) sprintf(ret, "FUCOMP ST(%d)", (b & 7));
+			else sprintf(ret, "OPCERR");
+		}
+		break;
+
+	case 0xDE:	// Escape code (A.2.6.9)
+		b = fgetc(fp);
+		if (b <= 0xBF) {
+			ext = get_regop(b);
+			switch (ext) {
+			case 0:
+				op = "FIADD"; break;
+			case 1:
+				op = "FIMUL"; break;
+			case 2:
+				op = "FICOM"; break;
+			case 3:
+				op = "FICOMP"; break;
+			case 4:
+				op = "FISUB"; break;
+			case 5:
+				op = "FISUBR"; break;
+			case 6:
+				op = "FIDIV"; break;
+			case 7:
+				op = "FIDIVR"; break;
+			}
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			sprintf(ret, "%s %s", op, opa1);
+		} else {
+			if (b >= 0xC0 && b <= 0xC7) sprintf(ret, "FADDP ST(%d),ST(0)", (b & 7));
+			else if (b >= 0xC8 && b <= 0xCF) sprintf(ret, "FMULP ST(%d),ST(0)", (b & 7));
+			else if (b == 0xD9) sprintf(ret, "FCOMPP");
+			else if (b >= 0xE0 && b <= 0xE7) sprintf(ret, "FSUBRP ST(%d),ST(0)", (b & 7));
+			else if (b >= 0xE8 && b <= 0xEF) sprintf(ret, "FSUBP ST(%d),ST(0)", (b & 7));
+			else if (b >= 0xF0 && b <= 0xF7) sprintf(ret, "FDIVRP ST(%d),ST(0)", (b & 7));
+			else if (b >= 0xF8 && b <= 0xFF) sprintf(ret, "FDIVP ST(%d),ST(0)", (b & 7));
+			else sprintf(ret, "OPCERR");
+		}
+		break;
+
+	case 0xDF:	// Escape code (A.2.6.10)
+		b = fgetc(fp);
+		if (b <= 0xBF) {
+			ext = get_regop(b);
+			switch (ext) {
+			case 0:
+				op = "FILD"; break;
+			case 1:
+				op = "OPCERR"; break;
+			case 2:
+				op = "FIST"; break;
+			case 3:
+				op = "FISTP"; break;
+			case 4:
+				op = "FBLD"; break;
+			case 5:
+				op = "FILD"; break;
+			case 6:
+				op = "FBSTP"; break;
+			case 7:
+				op = "FISTP"; break;
+			}
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			sprintf(ret, "%s %s", op, opa1);
+		} else {
+			if (b == 0xE0) sprintf(ret, "FSTSW AX");
+			else if (b >= 0xE8 && b <= 0xEF) sprintf(ret, "FUCOMIP ST(0),ST(%d)", (b & 7));
+			else if (b >= 0xF0 && b <= 0xF7) sprintf(ret, "FCOMIP ST(0),ST(%d)", (b & 7));
+			else sprintf(ret, "OPCERR");
+		}
 		break;
 
 	case 0xE0:	// LOOPNE Jb
