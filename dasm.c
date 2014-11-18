@@ -996,8 +996,50 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "XLAT");
 		break;
 
-	// ESC
-	case 0xD8:
+	case 0xD8:	// Escape code (A.2.6.3)
+		b = fgetc(fp);
+		if (b <= 0xBF) {
+			ext = get_regop(b);
+			switch (ext) {
+			case 0:
+				op = "FADD";
+				break;
+			case 1:
+				op = "FMUL";
+				break;
+			case 2:
+				op = "FCOM";
+				break;
+			case 3:
+				op = "FCOMP";
+				break;
+			case 4:
+				op = "FSUB";
+				break;
+			case 5:
+				op = "FSUBR";
+				break;
+			case 6:
+				op = "FDIV";
+				break;
+			case 7:
+				op = "FDIVR";
+				break;
+			}
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			sprintf(ret, "%s %s", op, opa1);
+		} else {
+			if (b >= 0xC0 && b <= 0xC7) sprintf(ret, "FADD ST(0),ST(%d)", (b & 7));
+			else if (b >= 0xC8 && b <= 0xCF) sprintf(ret, "FMUL ST(0),ST(%d)", (b & 7));
+			else if (b >= 0xD0 && b <= 0xD7) sprintf(ret, "FCOM ST(0),ST(%d)", (b & 7));
+			else if (b >= 0xD8 && b <= 0xDF) sprintf(ret, "FMUL ST(0),ST(%d)", (b & 7));
+			else if (b >= 0xE0 && b <= 0xE7) sprintf(ret, "FSUB ST(0),ST(%d)", (b & 7));
+			else if (b >= 0xE8 && b <= 0xEF) sprintf(ret, "FSUBR ST(0),ST(%d)", (b & 7));
+			else if (b >= 0xF0 && b <= 0xF7) sprintf(ret, "FDIV ST(0),ST(%d)", (b & 7));
+			else if (b >= 0xF8 && b <= 0xFF) sprintf(ret, "FDIVR ST(0),ST(%d)", (b & 7));
+		}
+		break;
+
 	case 0xD9:
 	case 0xDA:
 	case 0xDB:
