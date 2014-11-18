@@ -61,6 +61,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0x05:	// ADD EAX,Iv
 		d = get_dword(fp);
 		sprintf(ret, "ADD EAX,%X", d);
+		break;
 
 	case 0x06:	// PUSH ES
 		sprintf(ret, "PUSH ES");
@@ -106,6 +107,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0x0D:	// OR EAX,Iv
 		d = get_dword(fp);
 		sprintf(ret, "OR EAX,%X", d);
+		break;
 
 	case 0x0E:	// PUSH CS
 		sprintf(ret, "PUSH CS");
@@ -151,6 +153,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0x15:	// ADC EAX,Iv
 		d = get_dword(fp);
 		sprintf(ret, "ADC EAX,%X", d);
+		break;
 
 	case 0x16:	// PUSH SS
 		sprintf(ret, "PUSH SS");
@@ -196,6 +199,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0x1D:	// SBB EAX,Iv
 		d = get_dword(fp);
 		sprintf(ret, "SBB EAX,%X", d);
+		break;
 
 	case 0x1E:	// PUSH DS
 		sprintf(ret, "PUSH DS");
@@ -241,6 +245,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0x25:	// AND EAX,Iv
 		d = get_dword(fp);
 		sprintf(ret, "AND EAX,%X", d);
+		break;
 
 	case 0x26:	// SEG=ES
 		sprintf(ret, "SEG=ES");
@@ -286,6 +291,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0x2D:	// SUB EAX,Iv
 		d = get_dword(fp);
 		sprintf(ret, "SUB EAX,%X", d);
+		break;
 
 	case 0x2E:	// SEG=CS
 		sprintf(ret, "SEG=CS");
@@ -331,6 +337,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0x35:	// XOR EAX,Iv
 		d = get_dword(fp);
 		sprintf(ret, "XOR EAX,%X", d);
+		break;
 
 	case 0x36:	// SEG=SS
 		sprintf(ret, "SEG=SS");
@@ -376,6 +383,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0x3D:	// CMP EAX,Iv
 		d = get_dword(fp);
 		sprintf(ret, "CMP EAX,%X", d);
+		break;
 
 	case 0x3E:	// SEG=DS
 		sprintf(ret, "SEG=DS");
