@@ -1548,6 +1548,90 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "%s %s", op, opa1);
 		break;
 
+	case 0x0F:	// Two-byte opcode (first byte is 0Fh)
+		b = fgetc(fp);
+		switch (b) {
+
+		case 0x80:	// JO
+			d = get_dword(fp);
+			sprintf(ret, "JO %X", curaddr + 6 + (int32_t) d);
+			break;
+
+		case 0x81:	// JNO
+			d = get_dword(fp);
+			sprintf(ret, "JNO %X", curaddr + 6 + (int32_t) d);
+			break;
+
+		case 0x82:	// JB
+			d = get_dword(fp);
+			sprintf(ret, "JB %X", curaddr + 6 + (int32_t) d);
+			break;
+
+		case 0x83:	// JNB
+			d = get_dword(fp);
+			sprintf(ret, "JNB %X", curaddr + 6 + (int32_t) d);
+			break;
+
+		case 0x84:	// JE
+			d = get_dword(fp);
+			sprintf(ret, "JE %X", curaddr + 6 + (int32_t) d);
+			break;
+
+		case 0x85:	// JNE
+			d = get_dword(fp);
+			sprintf(ret, "JNE %X", curaddr + 6 + (int32_t) d);
+			break;
+
+		case 0x86:	// JBE
+			d = get_dword(fp);
+			sprintf(ret, "JBE %X", curaddr + 6 + (int32_t) d);
+			break;
+
+		case 0x87:	// JA
+			d = get_dword(fp);
+			sprintf(ret, "JA %X", curaddr + 6 + (int32_t) d);
+			break;
+
+		case 0x88:	// JS
+			d = get_dword(fp);
+			sprintf(ret, "JS %X", curaddr + 6 + (int32_t) d);
+			break;
+
+		case 0x89:	// JNS
+			d = get_dword(fp);
+			sprintf(ret, "JNS %X", curaddr + 6 + (int32_t) d);
+			break;
+
+		case 0x8A:	// JP
+			b = fgetc(fp);
+			sprintf(ret, "JP %X", curaddr + 6 + (int8_t) b);
+			break;
+
+		case 0x8B:	// JNP
+			b = fgetc(fp);
+			sprintf(ret, "JNP %X", curaddr + 6 + (int8_t) b);
+			break;
+
+		case 0x8C:	// JL
+			b = fgetc(fp);
+			sprintf(ret, "JL %X", curaddr + 6 + (int8_t) b);
+			break;
+
+		case 0x8D:	// JGE
+			b = fgetc(fp);
+			sprintf(ret, "JGE %X", curaddr + 6 + (int8_t) b);
+			break;
+
+		case 0x8E:	// JLE
+			b = fgetc(fp);
+			sprintf(ret, "JLE %X", curaddr + 6 + (int8_t) b);
+			break;
+
+		case 0x8F:	// JG
+			b = fgetc(fp);
+			sprintf(ret, "JG %X", curaddr + 6 + (int8_t) b);
+			break;
+
 	default:	// Unrecognized instruction
 		sprintf(ret, "OPCERR");
 		break;
