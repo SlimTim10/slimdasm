@@ -1552,85 +1552,258 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		b = fgetc(fp);
 		switch (b) {
 
-		case 0x80:	// JO
+		case 0x80:	// JO Iv
 			d = get_dword(fp);
 			sprintf(ret, "JO %X", curaddr + 6 + (int32_t) d);
 			break;
 
-		case 0x81:	// JNO
+		case 0x81:	// JNO Iv
 			d = get_dword(fp);
 			sprintf(ret, "JNO %X", curaddr + 6 + (int32_t) d);
 			break;
 
-		case 0x82:	// JB
+		case 0x82:	// JB Iv
 			d = get_dword(fp);
 			sprintf(ret, "JB %X", curaddr + 6 + (int32_t) d);
 			break;
 
-		case 0x83:	// JNB
+		case 0x83:	// JNB Iv
 			d = get_dword(fp);
 			sprintf(ret, "JNB %X", curaddr + 6 + (int32_t) d);
 			break;
 
-		case 0x84:	// JE
+		case 0x84:	// JE Iv
 			d = get_dword(fp);
 			sprintf(ret, "JE %X", curaddr + 6 + (int32_t) d);
 			break;
 
-		case 0x85:	// JNE
+		case 0x85:	// JNE Iv
 			d = get_dword(fp);
 			sprintf(ret, "JNE %X", curaddr + 6 + (int32_t) d);
 			break;
 
-		case 0x86:	// JBE
+		case 0x86:	// JBE Iv
 			d = get_dword(fp);
 			sprintf(ret, "JBE %X", curaddr + 6 + (int32_t) d);
 			break;
 
-		case 0x87:	// JA
+		case 0x87:	// JA Iv
 			d = get_dword(fp);
 			sprintf(ret, "JA %X", curaddr + 6 + (int32_t) d);
 			break;
 
-		case 0x88:	// JS
+		case 0x88:	// JS Iv
 			d = get_dword(fp);
 			sprintf(ret, "JS %X", curaddr + 6 + (int32_t) d);
 			break;
 
-		case 0x89:	// JNS
+		case 0x89:	// JNS Iv
 			d = get_dword(fp);
 			sprintf(ret, "JNS %X", curaddr + 6 + (int32_t) d);
 			break;
 
-		case 0x8A:	// JP
-			b = fgetc(fp);
+		case 0x8A:	// JP Iv
+			d = get_dword(fp);
 			sprintf(ret, "JP %X", curaddr + 6 + (int8_t) b);
 			break;
 
-		case 0x8B:	// JNP
-			b = fgetc(fp);
+		case 0x8B:	// JNP Iv
+			d = get_dword(fp);
 			sprintf(ret, "JNP %X", curaddr + 6 + (int8_t) b);
 			break;
 
-		case 0x8C:	// JL
-			b = fgetc(fp);
+		case 0x8C:	// JL Iv
+			d = get_dword(fp);
 			sprintf(ret, "JL %X", curaddr + 6 + (int8_t) b);
 			break;
 
-		case 0x8D:	// JGE
-			b = fgetc(fp);
+		case 0x8D:	// JGE Iv
+			d = get_dword(fp);
 			sprintf(ret, "JGE %X", curaddr + 6 + (int8_t) b);
 			break;
 
-		case 0x8E:	// JLE
-			b = fgetc(fp);
+		case 0x8E:	// JLE Iv
+			d = get_dword(fp);
 			sprintf(ret, "JLE %X", curaddr + 6 + (int8_t) b);
 			break;
 
-		case 0x8F:	// JG
-			b = fgetc(fp);
+		case 0x8F:	// JG Iv
+			d = get_dword(fp);
 			sprintf(ret, "JG %X", curaddr + 6 + (int8_t) b);
 			break;
+
+		case 0x90:	// SETO Eb
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETO %s", opa1);
+			break;
+
+		case 0x91:	// SETNO Eb
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETNO %s", opa1);
+			break;
+
+		case 0x92:	// SETB Eb
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETB %s", opa1);
+			break;
+
+		case 0x93:	// SETNB Eb
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETNB %s", opa1);
+			break;
+
+		case 0x94:	// SETE Eb
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETE %s", opa1);
+			break;
+
+		case 0x95:	// SETNE Eb
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETNE %s", opa1);
+			break;
+
+		case 0x96:	// SETBE Eb
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETBE %s", opa1);
+			break;
+
+		case 0x97:	// SETA Eb
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETA %s", opa1);
+			break;
+
+		case 0x98:	// SETS Iv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETS %X", opa1);
+			break;
+
+		case 0x99:	// SETNS Iv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETNS %X", opa1);
+			break;
+
+		case 0x9A:	// SETP Iv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETP %X", opa1);
+			break;
+
+		case 0x9B:	// SETNP Iv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETNP %X", opa1);
+			break;
+
+		case 0x9C:	// SETL Iv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETL %X", opa1);
+			break;
+
+		case 0x9D:	// SETGE Iv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETGE %X", opa1);
+			break;
+
+		case 0x9E:	// SETLE Iv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETLE %X", opa1);
+			break;
+
+		case 0x9F:	// SETG Iv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "SETG %X", opa1);
+			break;
+
+		case 0xA0:	// PUSH FS
+			sprintf(ret, "PUSH FS");
+			break;
+
+		case 0xA1:	// POP FS
+			sprintf(ret, "POP FS");
+			break;
+
+		case 0xA2:	// CPUID
+			sprintf(ret, "CPUID");
+			break;
+
+		case 0xA3:	// BT Ev,Gv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa2 = parse_modrm(fp, b, 'G', 'd');
+			sprintf(ret, "BT %s,%s", opa1, opa2);
+			break;
+
+		case 0xA4:	// SHLD Ev,Gv,Ib
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa2 = parse_modrm(fp, b, 'G', 'd');
+			b = fgetc(fp);
+			sprintf(ret, "SHLD %s,%s,%X", opa1, opa2, b);
+			break;
+
+		case 0xA5:	// SHLD Ev,Gv,CL
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa2 = parse_modrm(fp, b, 'G', 'd');
+			sprintf(ret, "SHLD %s,%s,CL", opa1, opa2);
+			break;
+
+		case 0xA8:	// PUSH GS
+			sprintf(ret, "PUSH GS");
+			break;
+
+		case 0xA9:	// POP GS
+			sprintf(ret, "POP GS");
+			break;
+
+		case 0xAA:	// RSM
+			sprintf(ret, "RSM");
+			break;
+
+		case 0xAB:	// BTS Ev,Gv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa2 = parse_modrm(fp, b, 'G', 'd');
+			sprintf(ret, "BTS %s,%s", opa1, opa2);
+			break;
+
+		case 0xAC:	// SHRD Ev,Gv,Ib
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa2 = parse_modrm(fp, b, 'G', 'd');
+			b = fgetc(fp);
+			sprintf(ret, "SHRD %s,%s,%X", opa1, opa2, b);
+			break;
+
+		case 0xAD:	// SHRD Ev,Gv,CL
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa2 = parse_modrm(fp, b, 'G', 'd');
+			sprintf(ret, "SHRD %s,%s,CL", opa1, opa2);
+			break;
+
+			///HERE
+
+		default:	// Invalid instruction
+			sprintf(ret, "OPCERR");
+			break;
+
+		}
+
 
 	default:	// Unrecognized instruction
 		sprintf(ret, "OPCERR");
