@@ -113,10 +113,6 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		sprintf(ret, "PUSH CS");
 		break;
 
-	case 0x0F:	// 2-byte escape
-		sprintf(ret, "???");
-		break;
-
 	case 0x10:	// ADC Eb,Gb
 		b = fgetc(fp);
 		opa1 = parse_modrm(fp, b, 'E', 'b');
@@ -1801,6 +1797,94 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			opa1 = parse_modrm(fp, b, 'G', 'd');
 			opa2 = parse_modrm(fp, b, 'E', 'd');
 			sprintf(ret, "IMUL %s,%s", opa1, opa2);
+			break;
+
+		case 0xB0:	// CMPXCHG Eb,Gb
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			opa2 = parse_modrm(fp, b, 'G', 'b');
+			sprintf(ret, "CMPXCHG %s,%s", opa1, opa2);
+			break;
+
+		case 0xB1:	// CMPXCHG Ev,Gv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'v');
+			opa2 = parse_modrm(fp, b, 'G', 'v');
+			sprintf(ret, "CMPXCHG %s,%s", opa1, opa2);
+			break;
+
+		case 0xB2:	// LSS Mp
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			sprintf(ret, "LSS %s", opa1);
+			break;
+
+		case 0xB3:	// BTR Ev,Gv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'v');
+			opa2 = parse_modrm(fp, b, 'G', 'v');
+			sprintf(ret, "BTR %s,%s", opa1, opa2);
+			break;
+
+		case 0xB4:	// LFS Mp
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			sprintf(ret, "LFS %s", opa1);
+			break;
+
+		case 0xB5:	// LGS Mp
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'd');
+			sprintf(ret, "LGS %s", opa1);
+			break;
+
+		case 0xB6:	// MOVZX Gv,Eb
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'G', 'd');
+			opa2 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "MOVZX %s,%s", opa1, opa2);
+			break;
+
+		case 0xB7:	// MOVZX Gv,Ew
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'G', 'd');
+			opa2 = parse_modrm(fp, b, 'E', 'w');
+			sprintf(ret, "MOVZX %s,%s", opa1, opa2);
+			break;
+
+		case 0xBB:	// BTC Ev,Gv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'v');
+			opa2 = parse_modrm(fp, b, 'G', 'v');
+			sprintf(ret, "BTC %s,%s", opa1, opa2);
+			break;
+
+		case 0xBC:	// BSF Gv,Ev
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'G', 'v');
+			opa2 = parse_modrm(fp, b, 'E', 'v');
+			sprintf(ret, "BSF %s,%s", opa1, opa2);
+			break;
+
+		case 0xBD:	// BSR Gv,Ev
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'G', 'v');
+			opa2 = parse_modrm(fp, b, 'E', 'v');
+			sprintf(ret, "BSR %s,%s", opa1, opa2);
+			break;
+
+		case 0xBE:	// MOVSX Gv,Eb
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'G', 'v');
+			opa2 = parse_modrm(fp, b, 'E', 'b');
+			sprintf(ret, "MOVSX %s,%s", opa1, opa2);
+			break;
+
+		case 0xBF:	// MOVSX Gv,Ew
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'G', 'v');
+			opa2 = parse_modrm(fp, b, 'E', 'w');
+			sprintf(ret, "MOVSX %s,%s", opa1, opa2);
 			break;
 
 			///HERE
