@@ -1919,6 +1919,8 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 		}
 
+		break;
+
 
 	default:	// Unrecognized/invalid instruction
 		sprintf(ret, "OPCERR");
