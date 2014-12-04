@@ -1796,16 +1796,23 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			sprintf(ret, "SHRD %s,%s,CL", opa1, opa2);
 			break;
 
+		case 0xAF:	// IMUL Gv,Ev
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'G', 'd');
+			opa2 = parse_modrm(fp, b, 'E', 'd');
+			sprintf(ret, "IMUL %s,%s", opa1, opa2);
+			break;
+
 			///HERE
 
-		default:	// Invalid instruction
+		default:	// Unrecogznized/invalid instruction
 			sprintf(ret, "OPCERR");
 			break;
 
 		}
 
 
-	default:	// Unrecognized instruction
+	default:	// Unrecognized/invalid instruction
 		sprintf(ret, "OPCERR");
 		break;
 
