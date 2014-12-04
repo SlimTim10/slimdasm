@@ -1887,7 +1887,31 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			sprintf(ret, "MOVSX %s,%s", opa1, opa2);
 			break;
 
-			///HERE
+		case 0xC0:	// XADD Eb,Gb
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'b');
+			opa2 = parse_modrm(fp, b, 'G', 'b');
+			sprintf(ret, "XADD %s,%s", opa1, opa2);
+			break;
+
+		case 0xC1:	// XADD Ev,Gv
+			b = fgetc(fp);
+			opa1 = parse_modrm(fp, b, 'E', 'v');
+			opa2 = parse_modrm(fp, b, 'G', 'v');
+			sprintf(ret, "XADD %s,%s", opa1, opa2);
+			break;
+
+		case 0xC8:	// BSWAP EAX
+		case 0xC9:	// BSWAP ECX
+		case 0xCA:	// BSWAP EDX
+		case 0xCB:	// BSWAP EBX
+		case 0xCC:	// BSWAP ESP
+		case 0xCD:	// BSWAP EBP
+		case 0xCE:	// BSWAP ESI
+		case 0xCF:	// BSWAP EDI
+			opa1 = reg_table(b, 'd');
+			sprintf(ret, "BSWAP %s", opa1);
+			break;
 
 		default:	// Unrecogznized/invalid instruction
 			sprintf(ret, "OPCERR");
