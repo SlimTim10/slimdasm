@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 	printf("Image base: %.8X\n", pe->base);
 	printf("Size of code section: %.8X\n", pe->codesize);
 
-	/* Get size of headers */
+	/* Get size of headers to know where code section starts */
 	fseek(fin, pe->offset + 84, SEEK_SET);
 	fgets(fbuf, 4, fin);
 
@@ -45,6 +45,10 @@ int main(int argc, char *argv[]) {
 	printf("OEP address: %.8X\n", pe->oep);
 
 	printf("\n");
+
+	/* Get max offset from total file size */
+	fseek(fin, 0L, SEEK_END);
+	pe->maxoffset = ftell(fin);
 
 	fseek(fin, pe->codeoffset, SEEK_SET);	// Go to start of code section
 
@@ -109,10 +113,24 @@ int main(int argc, char *argv[]) {
 			free(instr);
 			break;
 		}
+		case 'd': {	// Dump data at specific address
+			printf("\r \nAddress to dump: ");
+			char addrstr[32];
+			fgets(addrstr, sizeof(addrstr), stdin);
+			addr = strtol(addrstr, NULL, 16);
+			if (in_code_section(pe, addr)) {
+				printf("Valid!\n");
+			} else {
+				printf("Invalid...\n");
+			}
+			break;
+		}
 		case 'h':	// Show help
 		case '?':
 			print_help();
 			break;
+
+		// Special keys
 		case SPECIAL_KEY:
 			ch = _getch();
 			switch (ch) {
@@ -140,6 +158,7 @@ int main(int argc, char *argv[]) {
 				break;
 			}
 			break;
+
 		default:
 			printf("0x%X\n", ch);	// Debugging
 			break;

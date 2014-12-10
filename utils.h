@@ -6,6 +6,7 @@
 
 DWORD lendian(BYTE *, uint8_t);
 char *sign8x(BYTE);
+int in_code_section(PESTRUCT *, DWORD);
 int valid_addr(PESTRUCT *, DWORD);
 DWORD addr_to_offset(PESTRUCT *, DWORD);
 char *get_instr(FILE *, PESTRUCT *, DWORD);

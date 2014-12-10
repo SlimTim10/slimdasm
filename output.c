@@ -18,7 +18,7 @@ void print_help(void) {
 
 /* Parse and print the instruction at address addr, then point addr to the following instruction */
 int print_instr(FILE *fp, PESTRUCT *pe, DWORD *addr) {
-	if (!valid_addr(pe, *addr)) {
+	if (!in_code_section(pe, *addr)) {
 		printf("Address out of bounds\n\n");
 		return 0;
 	}

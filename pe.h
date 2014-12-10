@@ -14,6 +14,7 @@ typedef struct {
 	DWORD codesize;	// Size of code section
 	DWORD codeoffset;	// Code section offset
 	DWORD oep;	// Original entry point address
+	DWORD maxoffset;	// Maximum offset (total file size)
 } PESTRUCT;
 
 int parse_pe_header(PESTRUCT *, FILE *, BYTE *);
