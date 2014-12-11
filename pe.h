@@ -17,13 +17,17 @@ typedef struct {
 	DWORD codeoffset;	// Code section offset
 	DWORD oep;	// Original entry point address
 	DWORD maxoffset;	// Maximum offset (total file size)
+	BYTE sectheadersize;	// Size of each section header
 } PESTRUCT;
 
 typedef struct {
-	;
+	char name[8];	// Section name
+	DWORD va;	// Virtual address
+	DWORD size;	// Size of raw data
+	DWORD offset;	// Pointer to raw data
 } SECTSTRUCT;
 
 void parse_pe_header(PESTRUCT *, FILE *, BYTE *);
-void parse_section(SECTSTRUCT *, FILE *, BYTE *, int);
+void parse_section(SECTSTRUCT *, PESTRUCT *p, FILE *, BYTE *, int);
 
 #endif

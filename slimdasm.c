@@ -22,9 +22,11 @@ int main(int argc, char *argv[]) {
 
 	BYTE *fbuf;
 	PESTRUCT *pe;
+	SECTSTRUCT *sect;
 
 	fbuf = (BYTE *) malloc(256 * sizeof(BYTE));
 	pe = (PESTRUCT *) malloc(sizeof(PESTRUCT));
+	sect = (SECTSTRUCT *) malloc(sizeof(SECTSTRUCT));
 
 	parse_pe_header(pe, fin, fbuf);
 
@@ -37,18 +39,25 @@ int main(int argc, char *argv[]) {
 	/* Get size of headers to know where code section starts */
 	fseek(fin, pe->offset + 84, SEEK_SET);
 	fgets(fbuf, 4, fin);
-
 	pe->codeoffset = lendian(fbuf, 4);
 	printf("Code section offset: %.8X\n", pe->codeoffset);
 
+	/* Get OEP address */
 	pe->oep = pe->imagebase + pe->rvacode;
 	printf("OEP address: %.8X\n", pe->oep);
 
-	printf("\n");
+	printf("\n");	// Formatting
 
 	/* Get max offset from total file size */
 	fseek(fin, 0L, SEEK_END);
 	pe->maxoffset = ftell(fin);
+
+	parse_section(sect, pe, fin, fbuf, 0);	///TEST
+	///TEST
+	printf("section name: %s %d\n", sect->name, strcmp(sect->name == ".text"));
+	printf("section virtual address: %.8X\n", sect->va);
+	printf("section size: %.8X\n", sect->size);
+	printf("section offset: %.8X\n", sect->offset);
 
 	fseek(fin, pe->codeoffset, SEEK_SET);	// Go to start of code section
 
@@ -178,6 +187,7 @@ int main(int argc, char *argv[]) {
 
 	free(fbuf);
 	free(pe);
+	free(sect);
 
 	fclose(fin);
 
