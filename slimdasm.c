@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	printf("EP RVA: %.8X\n", pe->rvaep);
 	printf("Code section RVA: %.8X\n", pe->rvacode);
 	printf("Data section RVA: %.8X\n", pe->rvadata);
-	printf("Image base: %.8X\n", pe->base);
+	printf("Image base: %.8X\n", pe->imagebase);
 	printf("Size of code section: %.8X\n", pe->codesize);
 
 	/* Get size of headers to know where code section starts */
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
 	pe->codeoffset = lendian(fbuf, 4);
 	printf("Code section offset: %.8X\n", pe->codeoffset);
 
-	pe->oep = pe->base + pe->rvacode;
+	pe->oep = pe->imagebase + pe->rvacode;
 	printf("OEP address: %.8X\n", pe->oep);
 
 	printf("\n");
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
 			printf("EP RVA: %.8X\n", pe->rvaep);
 			printf("Code section RVA: %.8X\n", pe->rvacode);
 			printf("Data section RVA: %.8X\n", pe->rvadata);
-			printf("Image base: %.8X\n", pe->base);
+			printf("Image base: %.8X\n", pe->imagebase);
 			printf("Size of code section: %.8X\n", pe->codesize);
 			printf("Code section offset: %.8X\n", pe->codeoffset);
 			printf("OEP address: %.8X\n", pe->oep);
@@ -90,7 +90,8 @@ int main(int argc, char *argv[]) {
 			cur_addr = pe->oep;
 			break;
 		case 'g': {	// Go to specific address
-			printf("\r \nGo to address: ");
+			printf("\r \n");	// Clear line
+			printf("Go to address: ");
 			char getaddr[32];
 			fgets(getaddr, sizeof(getaddr), stdin);
 			addr = strtol(getaddr, NULL, 16);	// Parse input address
@@ -99,7 +100,8 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 		case 'f': {	// Follow instruction at specific address
-			printf("\r \nAddress of instruction to follow: ");
+			printf("\r \n");	// Clear line
+			printf("Address of instruction to follow: ");
 			char addrstr[32];
 			fgets(addrstr, sizeof(addrstr), stdin);
 			addr = strtol(addrstr, NULL, 16);
@@ -114,15 +116,24 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 		case 'd': {	// Dump data at specific address
-			printf("\r \nAddress to dump: ");
+			printf("\r \n");	// Clear line
+			printf("Address to dump: ");
 			char addrstr[32];
 			fgets(addrstr, sizeof(addrstr), stdin);
 			addr = strtol(addrstr, NULL, 16);
-			if (in_code_section(pe, addr)) {
-				printf("Valid!\n");
-			} else {
-				printf("Invalid...\n");
+			if (!valid_addr(pe, addr)) {
+				printf("Address out of bounds\n");
+				break;
 			}
+			printf("Number of bytes to dump: ");
+			char bytesstr[3];
+			fgets(bytesstr, sizeof(bytesstr), stdin);
+			int bytes = strtol(bytesstr, NULL, 10);
+			if (bytes > DUMP_MAX) {
+				printf("Too high\n");
+				break;
+			}
+			print_dump(fin, pe, addr, bytes);
 			break;
 		}
 		case 'h':	// Show help
@@ -145,7 +156,7 @@ int main(int argc, char *argv[]) {
 				printf("EP RVA: %.8X\n", pe->rvaep);
 				printf("Code section RVA: %.8X\n", pe->rvacode);
 				printf("Data section RVA: %.8X\n", pe->rvadata);
-				printf("Image base: %.8X\n", pe->base);
+				printf("Image base: %.8X\n", pe->imagebase);
 				printf("Size of code section: %.8X\n", pe->codesize);
 				printf("Code section offset: %.8X\n", pe->codeoffset);
 				printf("OEP address: %.8X\n", pe->oep);

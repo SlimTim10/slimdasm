@@ -13,6 +13,7 @@ void print_help(void) {
 	printf("o-Go to OEP\n");
 	printf("g-Go to address\n");
 	printf("f-Follow instruction\n");
+	printf("d-Dump\n");
 	printf("h-Show help\n\n");
 }
 
@@ -38,6 +39,18 @@ void print_ninstr(FILE *fp, PESTRUCT *pe, DWORD *addr, int n) {
 	int i;
 	for (i = 0; i < n; i++) {
 		print_instr(fp, pe, addr);
+	}
+}
+
+/* Print a dump of n bytes, given starting address */
+void print_dump(FILE *fp, PESTRUCT *pe, DWORD addr, int n) {
+	DWORD curpos = addr_to_offset(pe, addr);
+	printf("offset: %d\n", curpos);
+	fseek(fp, curpos, SEEK_SET);
+	int i;
+	for (i = 0; i < n && valid_addr(pe, addr); i++, addr++) {
+		BYTE b = fgetc(fp);	// Get byte at address
+		printf("%.8X: %.2X\n", addr, b);
 	}
 }
 

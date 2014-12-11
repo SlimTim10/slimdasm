@@ -37,8 +37,8 @@ char *sign8x(BYTE b) {
 
 /* Return true iff the address is within the bounds of the code section */
 int in_code_section(PESTRUCT *pe, DWORD addr) {
-	DWORD minaddr = pe->base;
-	DWORD maxaddr = pe->base + pe->rvacode + pe->codesize;
+	DWORD minaddr = pe->imagebase;
+	DWORD maxaddr = pe->imagebase + pe->rvacode + pe->codesize;
 
 	if (addr < minaddr || addr > maxaddr) {
 		return 0;
@@ -57,9 +57,10 @@ int valid_addr(PESTRUCT *pe, DWORD addr) {
 }
 
 /* Return address converted to offset */
+///TODO: fix this
 DWORD addr_to_offset(PESTRUCT *pe, DWORD addr) {
 	if (addr < pe->oep) {
-		return (addr - pe->base);
+		return (addr - pe->imagebase);
 	} else {
 		return (addr - pe->oep + pe->codeoffset);
 	}
