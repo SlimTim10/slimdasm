@@ -52,9 +52,9 @@ int main(int argc, char *argv[]) {
 	fseek(fin, 0L, SEEK_END);
 	pe->maxoffset = ftell(fin);
 
-	parse_section(sect, pe, fin, fbuf, 0);	///TEST
+	parse_section(sect, pe, fin, fbuf, 1);	///TEST
 	///TEST
-	printf("section name: %s %d\n", sect->name, strcmp(sect->name == ".text"));
+	printf("section name: %s %d\n", sect->name, strcmp(sect->name, ".text"));
 	printf("section virtual address: %.8X\n", sect->va);
 	printf("section size: %.8X\n", sect->size);
 	printf("section offset: %.8X\n", sect->offset);
