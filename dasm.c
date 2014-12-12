@@ -8,7 +8,7 @@
 
 /* Parse assembly instruction from file stream at current position and return a pointer to the string */
 char *parse_instr(FILE *fp, long int curaddr) {
-	BYTE b = fgetc(fp);
+	BYTE b = fgetc(fp);	// Get first byte of instruction
 	BYTE mod;
 	BYTE ext;
 	char *ret = (char *) malloc(64 * sizeof(char));	// Return string

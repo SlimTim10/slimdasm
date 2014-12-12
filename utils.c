@@ -36,9 +36,9 @@ char *sign8x(BYTE b) {
 }
 
 /* Return true iff the address is within the bounds of the code section */
-int valid_addr(PESTRUCT *pe, DWORD addr) {
-	DWORD minaddr = pe->base;
-	DWORD maxaddr = pe->base + pe->rvacode + pe->codesize;
+int in_code_section(PESTRUCT *pe, DWORD addr) {
+	DWORD minaddr = pe->imagebase;
+	DWORD maxaddr = pe->imagebase + pe->rvacode + pe->codesize;
 
 	if (addr < minaddr || addr > maxaddr) {
 		return 0;
@@ -47,23 +47,52 @@ int valid_addr(PESTRUCT *pe, DWORD addr) {
 	}
 }
 
-/* Return address converted to offset */
-DWORD addr_to_offset(PESTRUCT *pe, DWORD addr) {
-	if (addr < pe->oep) {
-		return (addr - pe->base);
+/* Return true iff the address is within the bounds of the entire file */
+int valid_addr(PESTRUCT *pe, FILE *fp, DWORD addr) {
+	if (addr_to_offset(pe, fp, addr) < pe->maxoffset) {
+		return 1;
 	} else {
-		return (addr - pe->oep + pe->codeoffset);
+		return 0;
 	}
+}
+
+/* Return address converted to offset */
+DWORD addr_to_offset(PESTRUCT *pe, FILE *fp, DWORD addr) {
+	DWORD offset;
+
+	if (addr < pe->oep) {
+		offset = addr - pe->imagebase;
+	} else {
+		SECTSTRUCT *sect = (SECTSTRUCT *) malloc(sizeof(SECTSTRUCT));
+		int i = 0;
+		do {
+			parse_section(sect, pe, fp, i);
+			// DEBUGGING
+			/* printf("section name: %s %d\n", sect->name, strcmp(sect->name, ".text")); */
+			/* printf("section virtual address: %.8X\n", sect->va); */
+			/* printf("section size: %.8X\n", sect->size); */
+			/* printf("section offset: %.8X\n", sect->offset); */
+			i++;
+		} while (i < pe->numsects &&
+				 ((addr - pe->imagebase) > (sect->va + sect->size)));
+
+		// Found the section containing addr
+		offset = addr - pe->imagebase - sect->va + sect->offset;
+
+		free(sect);
+	}
+
+	return offset;
 }
 
 /* Parse and return the instruction at address addr */
 char *get_instr(FILE *fp, PESTRUCT *pe, DWORD addr) {
-	if (!valid_addr(pe, addr)) {
+	if (!valid_addr(pe, fp, addr)) {
 		printf("Address out of bounds\n\n");
 		return;
 	}
 
-	DWORD curpos = addr_to_offset(pe, addr);	// Set current position in stream
+	DWORD curpos = addr_to_offset(pe, fp, addr);	// Set current position in stream
 	fseek(fp, curpos, SEEK_SET);
 
 	return ((char *) parse_instr(fp, addr));
