@@ -66,7 +66,7 @@ DWORD addr_to_offset(PESTRUCT *pe, FILE *fp, DWORD addr) {
 		SECTSTRUCT *sect = (SECTSTRUCT *) malloc(sizeof(SECTSTRUCT));
 		int i = 0;
 		do {
-			parse_section(sect, pe, fp, i);
+			parse_section(fp, pe, sect, i);
 			// DEBUGGING
 			/* printf("section name: %s %d\n", sect->name, strcmp(sect->name, ".text")); */
 			/* printf("section virtual address: %.8X\n", sect->va); */

@@ -20,13 +20,10 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-	BYTE *fbuf;
-	PESTRUCT *pe;
+	BYTE *fbuf = (BYTE *) malloc(16 * sizeof(BYTE));
+	PESTRUCT *pe = (PESTRUCT *) malloc(sizeof(PESTRUCT));;
 
-	fbuf = (BYTE *) malloc(256 * sizeof(BYTE));
-	pe = (PESTRUCT *) malloc(sizeof(PESTRUCT));
-
-	parse_pe_header(pe, fin, fbuf);
+	parse_pe_header(fin, pe);
 
 	printf("EP RVA: %.8X\n", pe->rvaep);
 	printf("Code section RVA: %.8X\n", pe->rvacode);

@@ -4,7 +4,9 @@
 #include "pe.h"
 
 /* Parse PE header and populate PESTRUCT variable */
-void parse_pe_header(PESTRUCT *p, FILE *fp, BYTE *buf) {
+void parse_pe_header(FILE *fp, PESTRUCT *p) {
+	BYTE *buf = (BYTE *) malloc(16 * sizeof(BYTE));
+
 	DWORD fpos = ftell(fp);	// Store the current file position
 
 	// Get PE offset value from DOS stub
@@ -51,10 +53,11 @@ void parse_pe_header(PESTRUCT *p, FILE *fp, BYTE *buf) {
 	p->sectheadersize = 40;
 
 	fseek(fp, fpos, SEEK_SET);	// Restore the file position
+	free(buf);
 }
 
 /* Parse given section number and populate SECTSTRUCT variable */
-void parse_section(SECTSTRUCT *sect, PESTRUCT *p, FILE *fp, int n) {
+void parse_section(FILE *fp, PESTRUCT *p, SECTSTRUCT *sect, int n) {
 	BYTE *buf = (BYTE *) malloc(4 * sizeof(BYTE));
 	DWORD fpos = ftell(fp);	// Store the current file position
 

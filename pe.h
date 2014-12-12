@@ -27,7 +27,7 @@ typedef struct {
 	DWORD offset;	// Pointer to raw data
 } SECTSTRUCT;
 
-void parse_pe_header(PESTRUCT *, FILE *, BYTE *);
-void parse_section(SECTSTRUCT *, PESTRUCT *p, FILE *, int);
+void parse_pe_header(FILE *, PESTRUCT *);
+void parse_section(FILE *, PESTRUCT *, SECTSTRUCT *, int);
 
 #endif
