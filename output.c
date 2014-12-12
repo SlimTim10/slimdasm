@@ -4,6 +4,7 @@
 #include "output.h"
 #include "defs.h"
 #include "pe.h"
+#include "utils.h"
 
 /* Show user interface help */
 void print_help(void) {
@@ -24,7 +25,7 @@ int print_instr(FILE *fp, PESTRUCT *pe, DWORD *addr) {
 		return 0;
 	}
 
-	DWORD curpos = addr_to_offset(pe, *addr);	// Set current position in stream
+	DWORD curpos = addr_to_offset(pe, fp, *addr);	// Set current position in stream
 	fseek(fp, curpos, SEEK_SET);
 	char *str = (char *) parse_instr(fp, *addr);
 	printf("%.8X\t%s\n", *addr, str);	// Parse and print instruction
@@ -44,13 +45,19 @@ void print_ninstr(FILE *fp, PESTRUCT *pe, DWORD *addr, int n) {
 
 /* Print a dump of n bytes, given starting address */
 void print_dump(FILE *fp, PESTRUCT *pe, DWORD addr, int n) {
-	DWORD curpos = addr_to_offset(pe, addr);
-	printf("offset: %d\n", curpos);
+	DWORD curpos = addr_to_offset(pe, fp, addr);
 	fseek(fp, curpos, SEEK_SET);
-	int i;
-	for (i = 0; i < n && valid_addr(pe, addr); i++, addr++) {
-		BYTE b = fgetc(fp);	// Get byte at address
-		printf("%.8X: %.2X\n", addr, b);
+	int i = 0;
+	while (i < n && valid_addr(pe, fp, addr)) {
+		printf("%.8X:", addr);	// Print address
+		/* Print bytes in groups of 16 */
+		int j;
+		for (j = 0; j < 16 && i < n && valid_addr(pe, fp, addr); j++, i++, addr++) {
+			BYTE b = fgetc(fp);	// Get byte at address
+			printf(" %.2X", b);
+		}
+		//		printf("    AAAAAAAAAAAAAAAA");///TEST
+		printf("\n");
 	}
 }
 

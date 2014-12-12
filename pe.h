@@ -28,6 +28,6 @@ typedef struct {
 } SECTSTRUCT;
 
 void parse_pe_header(PESTRUCT *, FILE *, BYTE *);
-void parse_section(SECTSTRUCT *, PESTRUCT *p, FILE *, BYTE *, int);
+void parse_section(SECTSTRUCT *, PESTRUCT *p, FILE *, int);
 
 #endif

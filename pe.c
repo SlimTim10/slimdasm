@@ -1,9 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "pe.h"
 
 /* Parse PE header and populate PESTRUCT variable */
 void parse_pe_header(PESTRUCT *p, FILE *fp, BYTE *buf) {
+	DWORD fpos = ftell(fp);	// Store the current file position
+
 	// Get PE offset value from DOS stub
 	fseek(fp, 0x3C, SEEK_SET);
 	fgets(buf, 4, fp);
@@ -46,10 +49,15 @@ void parse_pe_header(PESTRUCT *p, FILE *fp, BYTE *buf) {
 
 	// Each section header size is 40 bytes
 	p->sectheadersize = 40;
+
+	fseek(fp, fpos, SEEK_SET);	// Restore the file position
 }
 
 /* Parse given section number and populate SECTSTRUCT variable */
-void parse_section(SECTSTRUCT *sect, PESTRUCT *p, FILE *fp, BYTE *buf, int n) {
+void parse_section(SECTSTRUCT *sect, PESTRUCT *p, FILE *fp, int n) {
+	BYTE *buf = (BYTE *) malloc(4 * sizeof(BYTE));
+	DWORD fpos = ftell(fp);	// Store the current file position
+
 	// Go to beginning of section information
 	DWORD sect_offset = (p->offset + p->peheadersize + (n * p->sectheadersize));
 	fseek(fp, sect_offset, SEEK_SET);
@@ -71,4 +79,7 @@ void parse_section(SECTSTRUCT *sect, PESTRUCT *p, FILE *fp, BYTE *buf, int n) {
 	fseek(fp, sect_offset + 20, SEEK_SET);
 	fgets(buf, 4, fp);
 	sect->offset = lendian(buf, 4);
+
+	fseek(fp, fpos, SEEK_SET);	// Restore the file position
+	free(buf);
 }

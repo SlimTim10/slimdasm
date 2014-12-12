@@ -22,11 +22,9 @@ int main(int argc, char *argv[]) {
 
 	BYTE *fbuf;
 	PESTRUCT *pe;
-	SECTSTRUCT *sect;
 
 	fbuf = (BYTE *) malloc(256 * sizeof(BYTE));
 	pe = (PESTRUCT *) malloc(sizeof(PESTRUCT));
-	sect = (SECTSTRUCT *) malloc(sizeof(SECTSTRUCT));
 
 	parse_pe_header(pe, fin, fbuf);
 
@@ -51,13 +49,6 @@ int main(int argc, char *argv[]) {
 	/* Get max offset from total file size */
 	fseek(fin, 0L, SEEK_END);
 	pe->maxoffset = ftell(fin);
-
-	parse_section(sect, pe, fin, fbuf, 1);	///TEST
-	///TEST
-	printf("section name: %s %d\n", sect->name, strcmp(sect->name, ".text"));
-	printf("section virtual address: %.8X\n", sect->va);
-	printf("section size: %.8X\n", sect->size);
-	printf("section offset: %.8X\n", sect->offset);
 
 	fseek(fin, pe->codeoffset, SEEK_SET);	// Go to start of code section
 
@@ -130,7 +121,7 @@ int main(int argc, char *argv[]) {
 			char addrstr[32];
 			fgets(addrstr, sizeof(addrstr), stdin);
 			addr = strtol(addrstr, NULL, 16);
-			if (!valid_addr(pe, addr)) {
+			if (!valid_addr(pe, fin, addr)) {
 				printf("Address out of bounds\n");
 				break;
 			}
@@ -174,20 +165,21 @@ int main(int argc, char *argv[]) {
 				cur_addr = pe->oep;
 				break;
 			default:
-				printf("0x%X\n", ch);	// Debugging
+				//printf("0x%X\n", ch);	// DEBUGGING
 				break;
 			}
 			break;
 
 		default:
-			printf("0x%X\n", ch);	// Debugging
+			//printf("0x%X\n", ch);	// DEBUGGING
 			break;
 		}
+
+		fflush(stdin);
 	}
 
 	free(fbuf);
 	free(pe);
-	free(sect);
 
 	fclose(fin);
 
