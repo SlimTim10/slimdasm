@@ -4,6 +4,10 @@
 #include "defs.h"
 #include "pe.h"
 
+enum output_constants {
+	DUMP_WIDTH = 16,
+};
+
 void print_help(void);
 int print_instr(FILE *, PESTRUCT *, DWORD *);
 void print_ninstr(FILE *, PESTRUCT *, DWORD *, int);

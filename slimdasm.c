@@ -125,15 +125,17 @@ int main(int argc, char *argv[]) {
 				printf("Address out of bounds\n");
 				break;
 			}
-			printf("Number of bytes to dump: ");
+			printf("Number of bytes to dump (default 16): ");
 			char bytesstr[3];
 			fgets(bytesstr, sizeof(bytesstr), stdin);
 			int bytes = strtol(bytesstr, NULL, 10);
+			if (bytes == 0) bytes = 16;
 			if (bytes > DUMP_MAX) {
 				printf("Too high\n");
 				break;
 			}
 			print_dump(fin, pe, addr, bytes);
+			printf("\n");	// Formatting
 			break;
 		}
 		case 'h':	// Show help

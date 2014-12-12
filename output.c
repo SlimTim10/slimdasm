@@ -45,20 +45,32 @@ void print_ninstr(FILE *fp, PESTRUCT *pe, DWORD *addr, int n) {
 
 /* Print a dump of n bytes, given starting address */
 void print_dump(FILE *fp, PESTRUCT *pe, DWORD addr, int n) {
+	DWORD fpos = ftell(fp);	// Get current file position
+
 	DWORD curpos = addr_to_offset(pe, fp, addr);
 	fseek(fp, curpos, SEEK_SET);
+
+	char ascii[DUMP_WIDTH+1];	// Also show ASCII characters where possible
+
 	int i = 0;
 	while (i < n && valid_addr(pe, fp, addr)) {
 		printf("%.8X:", addr);	// Print address
 		/* Print bytes in groups of 16 */
 		int j;
-		for (j = 0; j < 16 && i < n && valid_addr(pe, fp, addr); j++, i++, addr++) {
+		for (j = 0; j < DUMP_WIDTH && i < n && valid_addr(pe, fp, addr); j++, i++, addr++) {
 			BYTE b = fgetc(fp);	// Get byte at address
-			printf(" %.2X", b);
+			printf(" %.2X", b);	// Output byte as hex
+			if (b >= ' ' && b <= '~') {	// Only show regular ASCII characters
+				ascii[j] = b;
+			} else {
+				ascii[j] = '.';	// Dot denotes special character
+			}
 		}
-		//		printf("    AAAAAAAAAAAAAAAA");///TEST
-		printf("\n");
+		for (; j <= DUMP_WIDTH; j++) ascii[j] = 0x00;	// End string
+		printf("    %s\n", ascii);
 	}
+
+	fseek(fp, fpos, SEEK_SET); // Restore previous file position
 }
 
 /* Print usage */
