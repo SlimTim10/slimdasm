@@ -15,6 +15,7 @@ void print_help(void) {
 	printf("g-Go to address\n");
 	printf("f-Follow instruction\n");
 	printf("d-Dump\n");
+	printf("s-Search for string\n");
 	printf("h-Show help\n\n");
 }
 

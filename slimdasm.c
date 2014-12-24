@@ -138,6 +138,10 @@ int main(int argc, char *argv[]) {
 			printf("\n");	// Formatting
 			break;
 		}
+		case 's': {	// Search for a string in .data, .rdata, and .rsrc sections (no unicode support)
+			
+			break;
+		}
 		case 'h':	// Show help
 		case '?':
 			print_help();
