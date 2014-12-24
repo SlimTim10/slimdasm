@@ -90,7 +90,8 @@ int main(int argc, char *argv[]) {
 			printf("\r \n");	// Clear line
 			printf("Go to address: ");
 			char getaddr[32];
-			fgets(getaddr, sizeof(getaddr), stdin);
+			fgets(getaddr, sizeof(getaddr), stdin);	// Get input
+			if (getaddr[0] == 0x0A) { printf("\n"); break; }	// Blank input (cancel instruction)
 			addr = strtol(getaddr, NULL, 16);	// Parse input address
 			if (!print_instr(fin, pe, &addr)) break;	// Print the first instruction
 			cur_addr = addr;
@@ -100,7 +101,8 @@ int main(int argc, char *argv[]) {
 			printf("\r \n");	// Clear line
 			printf("Address of instruction to follow: ");
 			char addrstr[32];
-			fgets(addrstr, sizeof(addrstr), stdin);
+			fgets(addrstr, sizeof(addrstr), stdin);	// Get input
+			if (addrstr[0] == 0x0A) { printf("\n"); break; }	// Blank input (cancel instruction)
 			addr = strtol(addrstr, NULL, 16);
 			char *instr = get_instr(fin, pe, addr);
 			if (!instr) break;	// Error
@@ -116,7 +118,8 @@ int main(int argc, char *argv[]) {
 			printf("\r \n");	// Clear line
 			printf("Address to dump: ");
 			char addrstr[32];
-			fgets(addrstr, sizeof(addrstr), stdin);
+			fgets(addrstr, sizeof(addrstr), stdin);	// Get input
+			if (addrstr[0] == 0x0A) { printf("\n"); break; }	// Blank input (cancel instruction)
 			addr = strtol(addrstr, NULL, 16);
 			if (!valid_addr(pe, fin, addr)) {
 				printf("Address out of bounds\n");
