@@ -3,10 +3,10 @@
 
 #include "defs.h"
 
-char *parse_instr(FILE *, long int);
-char *parse_modrm(FILE *, BYTE, char, char);
-WORD get_word(FILE *);
-DWORD get_dword(FILE *);
+char *parse_instr(long int);
+char *parse_modrm(BYTE, char, char);
+WORD get_word(void);
+DWORD get_dword(void);
 
 BYTE get_mod(BYTE);
 BYTE get_regop(BYTE);
