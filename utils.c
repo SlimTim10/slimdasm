@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "utils.h"
+#include "global.h"
 #include "defs.h"
 #include "pe.h"
 
@@ -36,7 +37,7 @@ char *sign8x(BYTE b) {
 }
 
 /* Return true iff the address is within the bounds of the code section */
-int in_code_section(PESTRUCT *pe, DWORD addr) {
+int in_code_section(DWORD addr) {
 	DWORD minaddr = pe->imagebase;
 	DWORD maxaddr = pe->imagebase + pe->rvacode + pe->codesize;
 
@@ -48,8 +49,8 @@ int in_code_section(PESTRUCT *pe, DWORD addr) {
 }
 
 /* Return true iff the address is within the bounds of the entire file */
-int valid_addr(PESTRUCT *pe, FILE *fp, DWORD addr) {
-	if (addr_to_offset(pe, fp, addr) < pe->maxoffset) {
+int valid_addr(DWORD addr) {
+	if (addr_to_offset(addr) < pe->maxoffset) {
 		return 1;
 	} else {
 		return 0;
@@ -57,7 +58,7 @@ int valid_addr(PESTRUCT *pe, FILE *fp, DWORD addr) {
 }
 
 /* Return address converted to offset */
-DWORD addr_to_offset(PESTRUCT *pe, FILE *fp, DWORD addr) {
+DWORD addr_to_offset(DWORD addr) {
 	DWORD offset;
 
 	if (addr < pe->oep) {
@@ -66,7 +67,7 @@ DWORD addr_to_offset(PESTRUCT *pe, FILE *fp, DWORD addr) {
 		SECTSTRUCT *sect = (SECTSTRUCT *) malloc(sizeof(SECTSTRUCT));
 		int i = 0;
 		do {
-			parse_section(fp, pe, sect, i);
+			parse_section(sect, i);
 			// DEBUGGING
 			/* printf("section name: %s %d\n", sect->name, strcmp(sect->name, ".text")); */
 			/* printf("section virtual address: %.8X\n", sect->va); */
@@ -86,16 +87,16 @@ DWORD addr_to_offset(PESTRUCT *pe, FILE *fp, DWORD addr) {
 }
 
 /* Parse and return the instruction at address addr */
-char *get_instr(FILE *fp, PESTRUCT *pe, DWORD addr) {
-	if (!valid_addr(pe, fp, addr)) {
+char *get_instr(DWORD addr) {
+	if (!valid_addr(addr)) {
 		printf("Address out of bounds\n\n");
 		return;
 	}
 
-	DWORD curpos = addr_to_offset(pe, fp, addr);	// Set current position in stream
-	fseek(fp, curpos, SEEK_SET);
+	DWORD curpos = addr_to_offset(addr);	// Set current position in stream
+	fseek(fin, curpos, SEEK_SET);
 
-	return ((char *) parse_instr(fp, addr));
+	return ((char *) parse_instr(addr));
 }
 
 /* Return first address in instruction string as DWORD */

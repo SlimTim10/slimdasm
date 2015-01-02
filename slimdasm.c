@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "global.h"
 #include "defs.h"
 #include "pe.h"
 #include "utils.h"
@@ -8,12 +9,14 @@
 #include "scan_codes.h"
 #include "output.h"
 
+/* Global variables */
+FILE *fin;	// Input file for disassembly
+PESTRUCT *pe;	// PE info about file
+
 int main(int argc, char *argv[]) {
 	if (argc < 2) {
 		usage(argv[0]);
 	}
-
-	FILE *fin;	// Input file for disassembly
 
 	if ((fin = fopen(argv[1], "rb")) == 0) {
 		fprintf(stderr, "Error: could not open file\n");
@@ -21,9 +24,9 @@ int main(int argc, char *argv[]) {
 	}
 
 	BYTE *fbuf = (BYTE *) malloc(16 * sizeof(BYTE));
-	PESTRUCT *pe = (PESTRUCT *) malloc(sizeof(PESTRUCT));;
+	pe = (PESTRUCT *) malloc(sizeof(PESTRUCT));
 
-	parse_pe_header(fin, pe);
+	parse_pe_header();
 
 	printf("EP RVA: %.8X\n", pe->rvaep);
 	printf("Code section RVA: %.8X\n", pe->rvacode);
@@ -68,10 +71,10 @@ int main(int argc, char *argv[]) {
 			quit = 1;
 			break;
 		case 'n':	// Next instruction
-			print_instr(fin, pe, &cur_addr);
+			print_instr(&cur_addr);
 			break;
 		case ' ':	// Next 32 instructions
-			print_ninstr(fin, pe, &cur_addr, 50);
+			print_ninstr(&cur_addr, 50);
 			break;
 		case 'o':	// Go back to OEP
 			printf("\r \n");	// Clear line
@@ -93,7 +96,7 @@ int main(int argc, char *argv[]) {
 			fgets(getaddr, sizeof(getaddr), stdin);	// Get input
 			if (getaddr[0] == 0x0A) { printf("\n"); break; }	// Blank input (cancel instruction)
 			addr = strtol(getaddr, NULL, 16);	// Parse input address
-			if (!print_instr(fin, pe, &addr)) break;	// Print the first instruction
+			if (!print_instr(&addr)) break;	// Print the first instruction
 			cur_addr = addr;
 			break;
 		}
@@ -104,12 +107,12 @@ int main(int argc, char *argv[]) {
 			fgets(addrstr, sizeof(addrstr), stdin);	// Get input
 			if (addrstr[0] == 0x0A) { printf("\n"); break; }	// Blank input (cancel instruction)
 			addr = strtol(addrstr, NULL, 16);
-			char *instr = get_instr(fin, pe, addr);
+			char *instr = get_instr(addr);
 			if (!instr) break;	// Error
 			printf("%.8X\t%s\n", addr, instr);	// Print instruction to follow
 			printf("\t\tv\n");
 			addr = parse_addr(instr);
-			if (!print_instr(fin, pe, &addr)) break;
+			if (!print_instr(&addr)) break;
 			cur_addr = addr;
 			free(instr);
 			break;
@@ -121,7 +124,7 @@ int main(int argc, char *argv[]) {
 			fgets(addrstr, sizeof(addrstr), stdin);	// Get input
 			if (addrstr[0] == 0x0A) { printf("\n"); break; }	// Blank input (cancel instruction)
 			addr = strtol(addrstr, NULL, 16);
-			if (!valid_addr(pe, fin, addr)) {
+			if (!valid_addr(addr)) {
 				printf("Address out of bounds\n");
 				break;
 			}
@@ -134,7 +137,7 @@ int main(int argc, char *argv[]) {
 				printf("Too high\n");
 				break;
 			}
-			print_dump(fin, pe, addr, bytes);
+			print_dump(addr, bytes);
 			printf("\n");	// Formatting
 			break;
 		}
@@ -152,10 +155,10 @@ int main(int argc, char *argv[]) {
 			ch = _getch();
 			switch (ch) {
 			case KEY_DOWN:	// Next instruction
-				print_instr(fin, pe, &cur_addr);
+				print_instr(&cur_addr);
 				break;
 			case KEY_PGDN:	// Next 32 instructions
-				print_ninstr(fin, pe, &cur_addr, 50);
+				print_ninstr(&cur_addr, 50);
 				break;
 			case KEY_HOME:	// Go back to OEP
 				printf("\r \n");	// Clear line

@@ -4,11 +4,12 @@
 #include <math.h>
 
 #include "dasm.h"
+#include "global.h"
 #include "defs.h"
 
 /* Parse assembly instruction from file stream at current position and return a pointer to the string */
-char *parse_instr(FILE *fp, long int curaddr) {
-	BYTE b = fgetc(fp);	// Get first byte of instruction
+char *parse_instr(long int curaddr) {
+	BYTE b = fgetc(fin);	// Get first byte of instruction
 	BYTE mod;
 	BYTE ext;
 	char *ret = (char *) malloc(64 * sizeof(char));	// Return string
@@ -26,40 +27,40 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	switch (b) {
 
 	case 0x00:	// ADD Eb,Gb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "ADD %s,%s", opa1, opa2);
 		break;
 
 	case 0x01:	// ADD Ev,Gv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		opa2 = parse_modrm(fp, b, 'G', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
+		opa2 = parse_modrm(b, 'G', 'd');
 		sprintf(ret, "ADD %s,%s", opa1, opa2);
 		break;
 
 	case 0x02:	// ADD Gb,Eb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "ADD %s,%s", opa1, opa2);
 		break;
 
 	case 0x03:	// ADD Gv,Ev
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "ADD %s,%s", opa1, opa2);
 		break;
 
 	case 0x04:	// ADD AL,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "ADD AL,%X", b);
 		break;
 
 	case 0x05:	// ADD EAX,Iv
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "ADD EAX,%X", d);
 		break;
 
@@ -72,40 +73,40 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x08:	// OR Eb,Gb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "OR %s,%s", opa1, opa2);
 		break;
 
 	case 0x09:	// OR Ev,Gv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		opa2 = parse_modrm(fp, b, 'G', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
+		opa2 = parse_modrm(b, 'G', 'd');
 		sprintf(ret, "OR %s,%s", opa1, opa2);
 		break;
 
 	case 0x0A:	// OR Gb,Eb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "OR %s,%s", opa1, opa2);
 		break;
 
 	case 0x0B:	// OR Gv,Ev
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "OR %s,%s", opa1, opa2);
 		break;
 
 	case 0x0C:	// OR AL,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "OR AL,%X", b);
 		break;
 
 	case 0x0D:	// OR EAX,Iv
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "OR EAX,%X", d);
 		break;
 
@@ -114,40 +115,40 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x10:	// ADC Eb,Gb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "ADC %s,%s", opa1, opa2);
 		break;
 
 	case 0x11:	// ADC Ev,Gv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		opa2 = parse_modrm(fp, b, 'G', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
+		opa2 = parse_modrm(b, 'G', 'd');
 		sprintf(ret, "ADC %s,%s", opa1, opa2);
 		break;
 
 	case 0x12:	// ADC Gb,Eb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "ADC %s,%s", opa1, opa2);
 		break;
 
 	case 0x13:	// ADC Gv,Ev
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "ADC %s,%s", opa1, opa2);
 		break;
 
 	case 0x14:	// ADC AL,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "ADC AL,%X", b);
 		break;
 
 	case 0x15:	// ADC EAX,Iv
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "ADC EAX,%X", d);
 		break;
 
@@ -160,40 +161,40 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x18:	// SBB Eb,Gb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "SBB %s,%s", opa1, opa2);
 		break;
 
 	case 0x19:	// SBB Ev,Gv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		opa2 = parse_modrm(fp, b, 'G', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
+		opa2 = parse_modrm(b, 'G', 'd');
 		sprintf(ret, "SBB %s,%s", opa1, opa2);
 		break;
 
 	case 0x1A:	// SBB Gb,Eb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "SBB %s,%s", opa1, opa2);
 		break;
 
 	case 0x1B:	// SBB Gv,Ev
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "SBB %s,%s", opa1, opa2);
 		break;
 
 	case 0x1C:	// SBB AL,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "SBB AL,%X", b);
 		break;
 
 	case 0x1D:	// SBB EAX,Iv
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "SBB EAX,%X", d);
 		break;
 
@@ -206,40 +207,40 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x20:	// AND Eb,Gb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "AND %s,%s", opa1, opa2);
 		break;
 
 	case 0x21:	// AND Ev,Gv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		opa2 = parse_modrm(fp, b, 'G', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
+		opa2 = parse_modrm(b, 'G', 'd');
 		sprintf(ret, "AND %s,%s", opa1, opa2);
 		break;
 
 	case 0x22:	// AND Gb,Eb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "AND %s,%s", opa1, opa2);
 		break;
 
 	case 0x23:	// AND Gv,Ev
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "AND %s,%s", opa1, opa2);
 		break;
 
 	case 0x24:	// AND AL,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "AND AL,%X", b);
 		break;
 
 	case 0x25:	// AND EAX,Iv
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "AND EAX,%X", d);
 		break;
 
@@ -252,40 +253,40 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x28:	// SUB Eb,Gb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "SUB %s,%s", opa1, opa2);
 		break;
 
 	case 0x29:	// SUB Ev,Gv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		opa2 = parse_modrm(fp, b, 'G', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
+		opa2 = parse_modrm(b, 'G', 'd');
 		sprintf(ret, "SUB %s,%s", opa1, opa2);
 		break;
 
 	case 0x2A:	// SUB Gb,Eb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "SUB %s,%s", opa1, opa2);
 		break;
 
 	case 0x2B:	// SUB Gv,Ev
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "SUB %s,%s", opa1, opa2);
 		break;
 
 	case 0x2C:	// SUB AL,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "SUB AL,%X", b);
 		break;
 
 	case 0x2D:	// SUB EAX,Iv
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "SUB EAX,%X", d);
 		break;
 
@@ -298,40 +299,40 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x30:	// XOR Eb,Gb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "XOR %s,%s", opa1, opa2);
 		break;
 
 	case 0x31:	// XOR Ev,Gv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		opa2 = parse_modrm(fp, b, 'G', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
+		opa2 = parse_modrm(b, 'G', 'd');
 		sprintf(ret, "XOR %s,%s", opa1, opa2);
 		break;
 
 	case 0x32:	// XOR Gb,Eb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "XOR %s,%s", opa1, opa2);
 		break;
 
 	case 0x33:	// XOR Gv,Ev
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "XOR %s,%s", opa1, opa2);
 		break;
 
 	case 0x34:	// XOR AL,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "XOR AL,%X", b);
 		break;
 
 	case 0x35:	// XOR EAX,Iv
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "XOR EAX,%X", d);
 		break;
 
@@ -344,40 +345,40 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x38:	// CMP Eb,Gb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "CMP %s,%s", opa1, opa2);
 		break;
 
 	case 0x39:	// CMP Ev,Gv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		opa2 = parse_modrm(fp, b, 'G', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
+		opa2 = parse_modrm(b, 'G', 'd');
 		sprintf(ret, "CMP %s,%s", opa1, opa2);
 		break;
 
 	case 0x3A:	// CMP Gb,Eb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "CMP %s,%s", opa1, opa2);
 		break;
 
 	case 0x3B:	// CMP Gv,Ev
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "CMP %s,%s", opa1, opa2);
 		break;
 
 	case 0x3C:	// CMP AL,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "CMP AL,%X", b);
 		break;
 
 	case 0x3D:	// CMP EAX,Iv
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "CMP EAX,%X", d);
 		break;
 
@@ -442,16 +443,16 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x62:	// BOUND Gv,Ma
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "BOUND %s,%s", opa1, opa2);
 		break;
 
 	case 0x63:	// ARPL Ew,Gw
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'w');
-		opa2 = parse_modrm(fp, b, 'G', 'w');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'w');
+		opa2 = parse_modrm(b, 'G', 'w');
 		sprintf(ret, "ARPL %s,%s", opa1, opa2);
 		break;
 
@@ -472,28 +473,28 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x68:	// PUSH Iv
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "PUSH %X", d);
 		break;
 
 	case 0x69:	// IMUL Gv,Ev,Iv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
-		d = get_dword(fp);
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
+		d = get_dword();
 		sprintf(ret, "IMUL %s,%s,%X", opa1, opa2, d);
 		break;
 
 	case 0x6A:	// PUSH Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "PUSH %s", sign8x(b));
 		break;
 
 	case 0x6B:	// IMUL Gv,Ev,Ib
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
-		b = fgetc(fp);
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
+		b = fgetc(fin);
 		sprintf(ret, "IMUL %s,%s,%s", opa1, opa2, sign8x(b));
 		break;
 
@@ -514,201 +515,201 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x70:	// JO SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JO SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x71:	// JNO SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JNO SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x72:	// JB SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JB SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x73:	// JAE SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JAE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x74:	// JE SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x75:	// JNE SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JNE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x76:	// JBE SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JBE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x77:	// JA SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JA SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x78:	// JS SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JS SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x79:	// JNS SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JNS SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x7A:	// JP SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JP SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x7B:	// JNP SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JNP SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x7C:	// JL SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JL SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x7D:	// JGE SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JGE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x7E:	// JLE SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JLE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0x7F:	// JG SHORT
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JG SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	// Immediate Group 1
 	case 0x80:	// Eb,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		op = group1_op(get_regop(b));
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		b = fgetc(fp);
+		opa1 = parse_modrm(b, 'E', 'b');
+		b = fgetc(fin);
 		sprintf(ret, "%s %s,%X", op, opa1, b);
 		break;
 
 	// Immediate Group 1
 	case 0x81:	// Ev,Iv
-		b = fgetc(fp);
+		b = fgetc(fin);
 		op = group1_op(get_regop(b));
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		d = get_dword(fp);
+		opa1 = parse_modrm(b, 'E', 'd');
+		d = get_dword();
 		sprintf(ret, "%s %s,%X", op, opa1, d);
 		break;
 
 	// Immediate Group 1
 	case 0x82:	// Ev,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		op = group1_op(get_regop(b));
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		b = fgetc(fp);
+		opa1 = parse_modrm(b, 'E', 'd');
+		b = fgetc(fin);
 		sprintf(ret, "%s %s,%s", op, opa1, sign8x(b));
 		break;
 
 	// Immediate Group 1
 	case 0x83:	// Ev,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		op = group1_op(get_regop(b));
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		b = fgetc(fp);
+		opa1 = parse_modrm(b, 'E', 'd');
+		b = fgetc(fin);
 		sprintf(ret, "%s %s,%s", op, opa1, sign8x(b));
 		break;
 
 	case 0x84:	// TEST Eb,Gb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "TEST %s,%s", opa1, opa2);
 		break;
 
 	case 0x85:	// TEST Ev,Gv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		opa2 = parse_modrm(fp, b, 'G', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
+		opa2 = parse_modrm(b, 'G', 'd');
 		sprintf(ret, "TEST %s,%s", opa1, opa2);
 		break;
 
 	case 0x86:	// XCHG Eb,Gb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "XCHG %s,%s", opa1, opa2);
 		break;
 
 	case 0x87:	// XCHG Ev,Gv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		opa2 = parse_modrm(fp, b, 'G', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
+		opa2 = parse_modrm(b, 'G', 'd');
 		sprintf(ret, "XCHG %s,%s", opa1, opa2);
 		break;
 
 	case 0x88:	// MOV Eb,Gb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		opa2 = parse_modrm(fp, b, 'G', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		opa2 = parse_modrm(b, 'G', 'b');
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
 
 	case 0x89:	// MOV Ev,Gv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		opa2 = parse_modrm(fp, b, 'G', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
+		opa2 = parse_modrm(b, 'G', 'd');
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
 
 	case 0x8A:	// MOV Gb,Eb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'b');
-		opa2 = parse_modrm(fp, b, 'E', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'b');
+		opa2 = parse_modrm(b, 'E', 'b');
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
 
 	case 0x8B:	// MOV Gv,Ev
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
 
 	case 0x8C:	// MOV Ew,Sw
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'w');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'w');
 		opa2 = segreg_table(get_regop(b));
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
 
 	case 0x8D:	// LEA Gv,M
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "LEA %s,%s", opa1, opa2);
 		break;
 
 	case 0x8E:	// MOV Sw,Ew
-		b = fgetc(fp);
+		b = fgetc(fin);
 		opa1 = segreg_table(get_regop(b));
-		opa2 = parse_modrm(fp, b, 'E', 'w');
+		opa2 = parse_modrm(b, 'E', 'w');
 		sprintf(ret, "MOV %s,%s", opa1, opa2);
 		break;
 
 	case 0x8F:	// POP Ev
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "POP %s", opa1);
 		break;
 
@@ -736,8 +737,8 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0x9A:	// CALLF Ap
-		d = get_dword(fp);
-		w = get_word(fp);
+		d = get_dword();
+		w = get_word();
 		sprintf(ret, "CALL FAR %X:%X", w, d);
 		break;
 
@@ -762,22 +763,22 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xA0:	// MOV AL,Ob
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "MOV AL,BYTE PTR [%X]", d);
 		break;
 
 	case 0xA1:	// MOV EAX,Ov
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "MOV EAX,DWORD PTR [%X]", d);
 		break;
 
 	case 0xA2:	// MOV Ob,AL
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "MOV BYTE PTR [%X],AL", d);
 		break;
 
 	case 0xA3:	// MOV Ov,EAX
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "MOV DWORD PTR [%X],EAX", d);
 		break;
 
@@ -798,12 +799,12 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xA8:	// TEST AL,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "TEST AL,%X", b);
 		break;
 
 	case 0xA9:	// TEST EAX,Iv
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "TEST EAX,%X", d);
 		break;
 
@@ -840,7 +841,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0xB6:	// MOV DH,Ib
 	case 0xB7:	// MOV BH,Ib
 		opa1 = reg_table(b, 'b');
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "MOV %s,%X", opa1, b);
 		break;
 
@@ -853,30 +854,30 @@ char *parse_instr(FILE *fp, long int curaddr) {
 	case 0xBE:	// MOV ESI,Iv
 	case 0xBF:	// MOV EDI,Iv
 		opa1 = reg_table(b, 'd');
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "MOV %s,%X", opa1, d);
 		break;
 
 	// Shift Group 2
 	case 0xC0:	// Eb,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		op = group2_op(get_regop(b));
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		b = fgetc(fp);
+		opa1 = parse_modrm(b, 'E', 'b');
+		b = fgetc(fin);
 		sprintf(ret, "%s %s,%X", op, opa1, b);
 		break;
 
 	// Shift Group 2
 	case 0xC1:	// Ev,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		op = group2_op(get_regop(b));
-		opa1 = parse_modrm(fp, b, 'E', 'v');
-		b = fgetc(fp);
+		opa1 = parse_modrm(b, 'E', 'v');
+		b = fgetc(fin);
 		sprintf(ret, "%s %s,%X", op, opa1, b);
 		break;
 
 	case 0xC2:	// RETN Iw
-		w = get_word(fp);
+		w = get_word();
 		sprintf(ret, "RETN %X", w);
 		break;
 
@@ -885,38 +886,38 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xC4:	// LES Gv,Mp
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "LES %s,%s", opa1, opa2);
 		break;
 
 	case 0xC5:	// LDS Gv,Mp
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'G', 'd');
-		opa2 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'G', 'd');
+		opa2 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "LDS %s,%s", opa1, opa2);
 		break;
 
 	// Group 11
 	case 0xC6:	// MOV Eb,Ib
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
-		b = fgetc(fp);
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
+		b = fgetc(fin);
 		sprintf(ret, "MOV %s,%X", opa1, b);
 		break;
 
 	// Group 11
 	case 0xC7:	// MOV Ev,Iv
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
-		d = get_dword(fp);
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
+		d = get_dword();
 		sprintf(ret, "MOV %s,%X", opa1, d);
 		break;
 
 	case 0xC8:	// ENTER Iw,Ib
-		w = get_word(fp);
-		b = fgetc(fp);
+		w = get_word();
+		b = fgetc(fin);
 		sprintf(ret, "ENTER %X,%X", w, b);
 		break;
 
@@ -925,7 +926,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xCA:	// RETF Iw
-		w = get_word(fp);
+		w = get_word();
 		sprintf(ret, "RETF %X", w);
 		break;
 
@@ -938,7 +939,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xCD:	// INT Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "INT %X", b);
 		break;
 
@@ -952,43 +953,43 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	// Shift Group 2
 	case 0xD0:	// Eb,1
-		b = fgetc(fp);
+		b = fgetc(fin);
 		op = group2_op(get_regop(b));
-		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa1 = parse_modrm(b, 'E', 'b');
 		sprintf(ret, "%s %s,1", op, opa1);
 		break;
 
 	// Shift Group 2
 	case 0xD1:	// Ev,1
-		b = fgetc(fp);
+		b = fgetc(fin);
 		op = group2_op(get_regop(b));
-		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa1 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "%s %s,1", op, opa1);
 		break;
 
 	// Shift Group 2
 	case 0xD2:	// Eb,CL
-		b = fgetc(fp);
+		b = fgetc(fin);
 		op = group2_op(get_regop(b));
-		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa1 = parse_modrm(b, 'E', 'b');
 		sprintf(ret, "%s %s,CL", op, opa1);
 		break;
 
 	// Shift Group 2
 	case 0xD3:	// Ev,CL
-		b = fgetc(fp);
+		b = fgetc(fin);
 		op = group2_op(get_regop(b));
-		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa1 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "%s %s,CL", op, opa1);
 		break;
 
 	case 0xD4:	// AAM Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "AAM %X", b);
 		break;
 
 	case 0xD5:	// AAD Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "AAD %X", b);
 		break;
 
@@ -1001,7 +1002,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xD8:	// Escape code (A.2.6.3)
-		b = fgetc(fp);
+		b = fgetc(fin);
 		if (b <= 0xBF) {
 			ext = get_regop(b);
 			switch (ext) {
@@ -1022,7 +1023,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			case 7:
 				op = "FDIVR"; break;
 			}
-			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa1 = parse_modrm(b, 'E', 'd');
 			sprintf(ret, "%s %s", op, opa1);
 		} else {
 			if (b >= 0xC0 && b <= 0xC7) sprintf(ret, "FADD ST(0),ST(%d)", (b & 7));
@@ -1037,7 +1038,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xD9:	// Escape code (A.2.6.4)
-		b = fgetc(fp);
+		b = fgetc(fin);
 		if (b <= 0xBF) {
 			ext = get_regop(b);
 			switch (ext) {
@@ -1058,7 +1059,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			case 7:
 				op = "FSTCW"; break;
 			}
-			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa1 = parse_modrm(b, 'E', 'd');
 			sprintf(ret, "%s %s", op, opa1);
 		} else {
 			if (b >= 0xC0 && b <= 0xC7) sprintf(ret, "FLD ST(0),ST(%d)", (b & 7));
@@ -1076,13 +1077,13 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			else if (b == 0xEE) sprintf(ret, "FLDZ");
 			else if (b == 0xF0) sprintf(ret, "F2XM1");
 			else if (b == 0xF1) sprintf(ret, "FYL2X");
-			else if (b == 0xF2) sprintf(ret, "FPTAN");
-			else if (b == 0xF3) sprintf(ret, "FPATAN");
+			else if (b == 0xF2) sprintf(ret, "FINTAN");
+			else if (b == 0xF3) sprintf(ret, "FINATAN");
 			else if (b == 0xF4) sprintf(ret, "FXTRACT");
-			else if (b == 0xF5) sprintf(ret, "FPREM1");
+			else if (b == 0xF5) sprintf(ret, "FINREM1");
 			else if (b == 0xF6) sprintf(ret, "FDECSTP");
 			else if (b == 0xF7) sprintf(ret, "FINCSTP");
-			else if (b == 0xF8) sprintf(ret, "FPREM");
+			else if (b == 0xF8) sprintf(ret, "FINREM");
 			else if (b == 0xF9) sprintf(ret, "FYL2XP1");
 			else if (b == 0xFA) sprintf(ret, "FSQRT");
 			else if (b == 0xFB) sprintf(ret, "FSINCOS");
@@ -1095,7 +1096,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xDA:	// Escape code (A.2.6.5)
-		b = fgetc(fp);
+		b = fgetc(fin);
 		if (b <= 0xBF) {
 			ext = get_regop(b);
 			switch (ext) {
@@ -1116,7 +1117,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			case 7:
 				op = "FIDIVR"; break;
 			}
-			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa1 = parse_modrm(b, 'E', 'd');
 			sprintf(ret, "%s %s", op, opa1);
 		} else {
 			if (b >= 0xC0 && b <= 0xC7) sprintf(ret, "FCMOVB ST(0),ST(%d)", (b & 7));
@@ -1129,7 +1130,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xDB:	// Escape code (A.2.6.6)
-		b = fgetc(fp);
+		b = fgetc(fin);
 		if (b <= 0xBF) {
 			ext = get_regop(b);
 			switch (ext) {
@@ -1150,7 +1151,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			case 7:
 				op = "FSTP"; break;
 			}
-			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa1 = parse_modrm(b, 'E', 'd');
 			sprintf(ret, "%s %s", op, opa1);
 		} else {
 			if (b >= 0xC0 && b <= 0xC7) sprintf(ret, "FCMOVNB ST(0),ST(%d)", (b & 7));
@@ -1166,7 +1167,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xDC:	// Escape code (A.2.6.7)
-		b = fgetc(fp);
+		b = fgetc(fin);
 		if (b <= 0xBF) {
 			ext = get_regop(b);
 			switch (ext) {
@@ -1187,7 +1188,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			case 7:
 				op = "FDIVR"; break;
 			}
-			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa1 = parse_modrm(b, 'E', 'd');
 			sprintf(ret, "%s %s", op, opa1);
 		} else {
 			if (b >= 0xC0 && b <= 0xC7) sprintf(ret, "FADD ST(%d),ST(0)", (b & 7));
@@ -1201,7 +1202,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xDD:	// Escape code (A.2.6.8)
-		b = fgetc(fp);
+		b = fgetc(fin);
 		if (b <= 0xBF) {
 			ext = get_regop(b);
 			switch (ext) {
@@ -1222,7 +1223,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			case 7:
 				op = "FSTSW"; break;
 			}
-			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa1 = parse_modrm(b, 'E', 'd');
 			sprintf(ret, "%s %s", op, opa1);
 		} else {
 			if (b >= 0xC0 && b <= 0xC7) sprintf(ret, "FFREE ST(%d)", (b & 7));
@@ -1235,7 +1236,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xDE:	// Escape code (A.2.6.9)
-		b = fgetc(fp);
+		b = fgetc(fin);
 		if (b <= 0xBF) {
 			ext = get_regop(b);
 			switch (ext) {
@@ -1256,7 +1257,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			case 7:
 				op = "FIDIVR"; break;
 			}
-			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa1 = parse_modrm(b, 'E', 'd');
 			sprintf(ret, "%s %s", op, opa1);
 		} else {
 			if (b >= 0xC0 && b <= 0xC7) sprintf(ret, "FADDP ST(%d),ST(0)", (b & 7));
@@ -1271,7 +1272,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xDF:	// Escape code (A.2.6.10)
-		b = fgetc(fp);
+		b = fgetc(fin);
 		if (b <= 0xBF) {
 			ext = get_regop(b);
 			switch (ext) {
@@ -1292,7 +1293,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			case 7:
 				op = "FISTP"; break;
 			}
-			opa1 = parse_modrm(fp, b, 'E', 'd');
+			opa1 = parse_modrm(b, 'E', 'd');
 			sprintf(ret, "%s %s", op, opa1);
 		} else {
 			if (b == 0xE0) sprintf(ret, "FSTSW AX");
@@ -1303,63 +1304,63 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xE0:	// LOOPNE Jb
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "LOOPNE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0xE1:	// LOOPE Jb
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "LOOPE SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0xE2:	// LOOP Jb
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "LOOP SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0xE3:	// JECXZ Jb
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JECXZ SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
 	case 0xE4:	// IN AL,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "IN AL,%X", b);
 		break;
 
 	case 0xE5:	// IN EAX,Ib
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "IN EAX,%X", b);
 		break;
 
 	case 0xE6:	// OUT Ib,AL
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "OUT %X,AL", b);
 		break;
 
 	case 0xE7:	// OUT Ib,EAX
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "OUT %X,EAX", b);
 		break;
 
 	case 0xE8:	// CALL Jv
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "CALL %X", curaddr + 5 + (int32_t) d);
 		break;
 
 	case 0xE9:	// JMP NEAR Jv
-		d = get_dword(fp);
+		d = get_dword();
 		sprintf(ret, "JMP NEAR %X", curaddr + 5 + (int32_t) d);
 		break;
 
 	case 0xEA:	// JMP FAR Ap
-		d = get_dword(fp);
-		w = get_word(fp);
+		d = get_dword();
+		w = get_word();
 		sprintf(ret, "JMP FAR %X:%X", w, d);
 		break;
 
 	case 0xEB:	// JMP SHORT Jb
-		b = fgetc(fp);
+		b = fgetc(fin);
 		sprintf(ret, "JMP SHORT %X", curaddr + 2 + (int8_t) b);
 		break;
 
@@ -1405,12 +1406,12 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	// Unary Group 3
 	case 0xF6:	// Eb
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'b');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'b');
 		switch (get_regop(b)) {
 		case 0:
 			op = "TEST";
-			b = fgetc(fp);
+			b = fgetc(fin);
 			sprintf(ret, "TEST %s,%X", opa1, b);
 			break;
 		case 2:
@@ -1439,12 +1440,12 @@ char *parse_instr(FILE *fp, long int curaddr) {
 
 	// Unary Group 3
 	case 0xF7:	// Ev
-		b = fgetc(fp);
-		opa1 = parse_modrm(fp, b, 'E', 'd');
+		b = fgetc(fin);
+		opa1 = parse_modrm(b, 'E', 'd');
 		switch (get_regop(b)) {
 		case 0:
 			op = "TEST";
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "TEST %s,%X", opa1, d);
 			break;
 		case 2:
@@ -1496,7 +1497,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 		break;
 
 	case 0xFE:	// INC/DEC Group 4
-		b = fgetc(fp);
+		b = fgetc(fin);
 		switch (get_regop(b)) {
 		case 0:
 			op = "INC";
@@ -1508,12 +1509,12 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			op = "OPCERR";
 			break;
 		}
-		opa1 = parse_modrm(fp, b, 'E', 'b');
+		opa1 = parse_modrm(b, 'E', 'b');
 		sprintf(ret, "%s %s", op, opa1);
 		break;
 
 	case 0xFF:	// INC/DEC Group 5
-		b = fgetc(fp);
+		b = fgetc(fin);
 		switch (get_regop(b)) {
 		case 0:
 			op = "INC";
@@ -1540,187 +1541,187 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			op = "OPCERR";
 			break;
 		}
-		opa1 = parse_modrm(fp, b, 'E', 'd');
+		opa1 = parse_modrm(b, 'E', 'd');
 		sprintf(ret, "%s %s", op, opa1);
 		break;
 
 	case 0x0F:	// Two-byte opcode (first byte is 0Fh)
-		b = fgetc(fp);
+		b = fgetc(fin);
 		switch (b) {
 
 		case 0x80:	// JO Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JO %X", curaddr + 6 + (int32_t) d);
 			break;
 
 		case 0x81:	// JNO Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JNO %X", curaddr + 6 + (int32_t) d);
 			break;
 
 		case 0x82:	// JB Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JB %X", curaddr + 6 + (int32_t) d);
 			break;
 
 		case 0x83:	// JNB Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JNB %X", curaddr + 6 + (int32_t) d);
 			break;
 
 		case 0x84:	// JE Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JE %X", curaddr + 6 + (int32_t) d);
 			break;
 
 		case 0x85:	// JNE Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JNE %X", curaddr + 6 + (int32_t) d);
 			break;
 
 		case 0x86:	// JBE Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JBE %X", curaddr + 6 + (int32_t) d);
 			break;
 
 		case 0x87:	// JA Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JA %X", curaddr + 6 + (int32_t) d);
 			break;
 
 		case 0x88:	// JS Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JS %X", curaddr + 6 + (int32_t) d);
 			break;
 
 		case 0x89:	// JNS Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JNS %X", curaddr + 6 + (int32_t) d);
 			break;
 
 		case 0x8A:	// JP Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JP %X", curaddr + 6 + (int8_t) b);
 			break;
 
 		case 0x8B:	// JNP Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JNP %X", curaddr + 6 + (int8_t) b);
 			break;
 
 		case 0x8C:	// JL Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JL %X", curaddr + 6 + (int8_t) b);
 			break;
 
 		case 0x8D:	// JGE Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JGE %X", curaddr + 6 + (int8_t) b);
 			break;
 
 		case 0x8E:	// JLE Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JLE %X", curaddr + 6 + (int8_t) b);
 			break;
 
 		case 0x8F:	// JG Iv
-			d = get_dword(fp);
+			d = get_dword();
 			sprintf(ret, "JG %X", curaddr + 6 + (int8_t) b);
 			break;
 
 		case 0x90:	// SETO Eb
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETO %s", opa1);
 			break;
 
 		case 0x91:	// SETNO Eb
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETNO %s", opa1);
 			break;
 
 		case 0x92:	// SETB Eb
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETB %s", opa1);
 			break;
 
 		case 0x93:	// SETNB Eb
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETNB %s", opa1);
 			break;
 
 		case 0x94:	// SETE Eb
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETE %s", opa1);
 			break;
 
 		case 0x95:	// SETNE Eb
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETNE %s", opa1);
 			break;
 
 		case 0x96:	// SETBE Eb
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETBE %s", opa1);
 			break;
 
 		case 0x97:	// SETA Eb
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETA %s", opa1);
 			break;
 
 		case 0x98:	// SETS Iv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETS %X", opa1);
 			break;
 
 		case 0x99:	// SETNS Iv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETNS %X", opa1);
 			break;
 
 		case 0x9A:	// SETP Iv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETP %X", opa1);
 			break;
 
 		case 0x9B:	// SETNP Iv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETNP %X", opa1);
 			break;
 
 		case 0x9C:	// SETL Iv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETL %X", opa1);
 			break;
 
 		case 0x9D:	// SETGE Iv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETGE %X", opa1);
 			break;
 
 		case 0x9E:	// SETLE Iv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETLE %X", opa1);
 			break;
 
 		case 0x9F:	// SETG Iv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "SETG %X", opa1);
 			break;
 
@@ -1737,24 +1738,24 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			break;
 
 		case 0xA3:	// BT Ev,Gv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'd');
-			opa2 = parse_modrm(fp, b, 'G', 'd');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'd');
+			opa2 = parse_modrm(b, 'G', 'd');
 			sprintf(ret, "BT %s,%s", opa1, opa2);
 			break;
 
 		case 0xA4:	// SHLD Ev,Gv,Ib
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'd');
-			opa2 = parse_modrm(fp, b, 'G', 'd');
-			b = fgetc(fp);
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'd');
+			opa2 = parse_modrm(b, 'G', 'd');
+			b = fgetc(fin);
 			sprintf(ret, "SHLD %s,%s,%X", opa1, opa2, b);
 			break;
 
 		case 0xA5:	// SHLD Ev,Gv,CL
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'd');
-			opa2 = parse_modrm(fp, b, 'G', 'd');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'd');
+			opa2 = parse_modrm(b, 'G', 'd');
 			sprintf(ret, "SHLD %s,%s,CL", opa1, opa2);
 			break;
 
@@ -1771,133 +1772,133 @@ char *parse_instr(FILE *fp, long int curaddr) {
 			break;
 
 		case 0xAB:	// BTS Ev,Gv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'd');
-			opa2 = parse_modrm(fp, b, 'G', 'd');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'd');
+			opa2 = parse_modrm(b, 'G', 'd');
 			sprintf(ret, "BTS %s,%s", opa1, opa2);
 			break;
 
 		case 0xAC:	// SHRD Ev,Gv,Ib
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'd');
-			opa2 = parse_modrm(fp, b, 'G', 'd');
-			b = fgetc(fp);
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'd');
+			opa2 = parse_modrm(b, 'G', 'd');
+			b = fgetc(fin);
 			sprintf(ret, "SHRD %s,%s,%X", opa1, opa2, b);
 			break;
 
 		case 0xAD:	// SHRD Ev,Gv,CL
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'd');
-			opa2 = parse_modrm(fp, b, 'G', 'd');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'd');
+			opa2 = parse_modrm(b, 'G', 'd');
 			sprintf(ret, "SHRD %s,%s,CL", opa1, opa2);
 			break;
 
 		case 0xAF:	// IMUL Gv,Ev
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'G', 'd');
-			opa2 = parse_modrm(fp, b, 'E', 'd');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'G', 'd');
+			opa2 = parse_modrm(b, 'E', 'd');
 			sprintf(ret, "IMUL %s,%s", opa1, opa2);
 			break;
 
 		case 0xB0:	// CMPXCHG Eb,Gb
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
-			opa2 = parse_modrm(fp, b, 'G', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
+			opa2 = parse_modrm(b, 'G', 'b');
 			sprintf(ret, "CMPXCHG %s,%s", opa1, opa2);
 			break;
 
 		case 0xB1:	// CMPXCHG Ev,Gv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'v');
-			opa2 = parse_modrm(fp, b, 'G', 'v');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'v');
+			opa2 = parse_modrm(b, 'G', 'v');
 			sprintf(ret, "CMPXCHG %s,%s", opa1, opa2);
 			break;
 
 		case 0xB2:	// LSS Mp
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'd');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'd');
 			sprintf(ret, "LSS %s", opa1);
 			break;
 
 		case 0xB3:	// BTR Ev,Gv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'v');
-			opa2 = parse_modrm(fp, b, 'G', 'v');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'v');
+			opa2 = parse_modrm(b, 'G', 'v');
 			sprintf(ret, "BTR %s,%s", opa1, opa2);
 			break;
 
 		case 0xB4:	// LFS Mp
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'd');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'd');
 			sprintf(ret, "LFS %s", opa1);
 			break;
 
 		case 0xB5:	// LGS Mp
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'd');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'd');
 			sprintf(ret, "LGS %s", opa1);
 			break;
 
 		case 0xB6:	// MOVZX Gv,Eb
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'G', 'd');
-			opa2 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'G', 'd');
+			opa2 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "MOVZX %s,%s", opa1, opa2);
 			break;
 
 		case 0xB7:	// MOVZX Gv,Ew
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'G', 'd');
-			opa2 = parse_modrm(fp, b, 'E', 'w');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'G', 'd');
+			opa2 = parse_modrm(b, 'E', 'w');
 			sprintf(ret, "MOVZX %s,%s", opa1, opa2);
 			break;
 
 		case 0xBB:	// BTC Ev,Gv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'v');
-			opa2 = parse_modrm(fp, b, 'G', 'v');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'v');
+			opa2 = parse_modrm(b, 'G', 'v');
 			sprintf(ret, "BTC %s,%s", opa1, opa2);
 			break;
 
 		case 0xBC:	// BSF Gv,Ev
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'G', 'v');
-			opa2 = parse_modrm(fp, b, 'E', 'v');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'G', 'v');
+			opa2 = parse_modrm(b, 'E', 'v');
 			sprintf(ret, "BSF %s,%s", opa1, opa2);
 			break;
 
 		case 0xBD:	// BSR Gv,Ev
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'G', 'v');
-			opa2 = parse_modrm(fp, b, 'E', 'v');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'G', 'v');
+			opa2 = parse_modrm(b, 'E', 'v');
 			sprintf(ret, "BSR %s,%s", opa1, opa2);
 			break;
 
 		case 0xBE:	// MOVSX Gv,Eb
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'G', 'v');
-			opa2 = parse_modrm(fp, b, 'E', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'G', 'v');
+			opa2 = parse_modrm(b, 'E', 'b');
 			sprintf(ret, "MOVSX %s,%s", opa1, opa2);
 			break;
 
 		case 0xBF:	// MOVSX Gv,Ew
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'G', 'v');
-			opa2 = parse_modrm(fp, b, 'E', 'w');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'G', 'v');
+			opa2 = parse_modrm(b, 'E', 'w');
 			sprintf(ret, "MOVSX %s,%s", opa1, opa2);
 			break;
 
 		case 0xC0:	// XADD Eb,Gb
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'b');
-			opa2 = parse_modrm(fp, b, 'G', 'b');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'b');
+			opa2 = parse_modrm(b, 'G', 'b');
 			sprintf(ret, "XADD %s,%s", opa1, opa2);
 			break;
 
 		case 0xC1:	// XADD Ev,Gv
-			b = fgetc(fp);
-			opa1 = parse_modrm(fp, b, 'E', 'v');
-			opa2 = parse_modrm(fp, b, 'G', 'v');
+			b = fgetc(fin);
+			opa1 = parse_modrm(b, 'E', 'v');
+			opa2 = parse_modrm(b, 'G', 'v');
 			sprintf(ret, "XADD %s,%s", opa1, opa2);
 			break;
 
@@ -1936,7 +1937,7 @@ char *parse_instr(FILE *fp, long int curaddr) {
 }
 
 /* Parse ModR/M byte and return a string of the operand, given the addressing code (A.1.1.) and operand size, according to Table 2-2 */
-char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
+char *parse_modrm(BYTE b, char addr_code, char bwd) {
 	char *ret = (char *) malloc(64 * sizeof(char));
 	BYTE mod = get_mod(b);
 	BYTE regop = get_regop(b);
@@ -1972,12 +1973,12 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 				break;
 			case 4:	// Mod = 00, R/M = 100
 				// SIB byte follows
-				b = fgetc(fp);
+				b = fgetc(fin);
 				sprintf(ret, "%s PTR [%s]", size, sib_to_str(b));
 				break;
 			case 5:	// Mod = 00, R/M = 101
 				// 32-bit displacement follows
-				d = get_dword(fp);
+				d = get_dword();
 				sprintf(ret, "%s PTR [%X]", size, d);
 				break;
 			}
@@ -1992,7 +1993,7 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 			case 6:	// Mod = 01, R/M = 110
 			case 7:	// Mod = 01, R/M = 111
 				// sign-extended 8-bit displacement follows
-				b = fgetc(fp);
+				b = fgetc(fin);
 				if (b & 0x80) {
 					sprintf(ret, "%s PTR [%s-%X]", size, reg_table(rm, 'd'), (BYTE) ((~b)+1));
 				} else {
@@ -2001,10 +2002,10 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 				break;
 			case 4:	// Mod = 01, R/M = 100
 				// SIB byte follows
-				b = fgetc(fp);
+				b = fgetc(fin);
 				tmp = sib_to_str(b);
 				// sign-extended 8-bit displacement follows
-				b = fgetc(fp);
+				b = fgetc(fin);
 				if (b & 0x80) {
 					sprintf(ret, "%s PTR [%s-%X]", size, tmp, (BYTE) ((~b)+1));
 				} else {
@@ -2023,15 +2024,15 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 			case 6:	// Mod = 10, R/M = 110
 			case 7:	// Mod = 10, R/M = 111
 				// 32-bit displacement follows
-				d = get_dword(fp);
+				d = get_dword();
 				sprintf(ret, "%s PTR [%s+%X]", size, reg_table(rm, 'd'), d);
 				break;
 			case 4:	// Mod = 10, R/M = 100
 				// SIB byte follows
-				b = fgetc(fp);
+				b = fgetc(fin);
 				tmp = sib_to_str(b);
 				// 32-bit displacement follows
-				d = get_dword(fp);
+				d = get_dword();
 				sprintf(ret, "%s PTR [%s+%X]", size, tmp, d);
 				break;
 			}
@@ -2050,19 +2051,19 @@ char *parse_modrm(FILE *fp, BYTE b, char addr_code, char bwd) {
 }
 
 /* Return next 4 bytes in file as WORD */
-WORD get_word(FILE *fp) {
-	WORD r = fgetc(fp)
-		| (fgetc(fp) << 8);
+WORD get_word(void) {
+	WORD r = fgetc(fin)
+		| (fgetc(fin) << 8);
 
 	return r;
 }
 
 /* Return next 4 bytes in file as DWORD */
-DWORD get_dword(FILE *fp) {
-	DWORD r = fgetc(fp)
-		| (fgetc(fp) << 8)
-		| (fgetc(fp) << 16)
-		| (fgetc(fp) << 24);
+DWORD get_dword(void) {
+	DWORD r = fgetc(fin)
+		| (fgetc(fin) << 8)
+		| (fgetc(fin) << 16)
+		| (fgetc(fin) << 24);
 
 	return r;
 }
