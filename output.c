@@ -75,6 +75,36 @@ void print_dump(DWORD addr, int n) {
 	fseek(fin, fpos, SEEK_SET); // Restore previous file position
 }
 
+/* Print a dump of a null-terminated string at starting address */
+void print_dump_str(DWORD addr) {
+	DWORD fpos = ftell(fin);	// Get current file position
+
+	DWORD curpos = addr_to_offset(addr);
+	fseek(fin, curpos, SEEK_SET);
+
+	char ascii[DUMP_WIDTH+1];	// Also show ASCII characters where possible
+
+	BYTE b = fgetc(fin);	// Get byte at address
+	while (b != '\0' && valid_addr(addr)) {
+		printf("%.8X:", addr);	// Print address
+		/* Print bytes in groups of 16 */
+		int j;
+		for (j = 0; j < DUMP_WIDTH && b != '\0' && valid_addr(addr); j++, addr++) {
+			printf(" %.2X", b);	// Output byte as hex
+			if (b >= ' ' && b <= '~') {	// Only show regular ASCII characters
+				ascii[j] = b;
+			} else {
+				ascii[j] = '.';	// Dot denotes special character
+			}
+			b = fgetc(fin);	// Get byte at address
+		}
+		for (; j <= DUMP_WIDTH; j++) ascii[j] = 0x00;	// End string
+		printf("    %s\n", ascii);
+	}
+
+	fseek(fin, fpos, SEEK_SET); // Restore previous file position
+}
+
 /* Print usage */
 void usage(char *prog) {
 	fprintf(stderr, "usage: %s target\n", prog);
