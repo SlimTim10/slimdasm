@@ -1,0 +1,15 @@
+* DONE Add string search command
+  CLOSED: [2015-01-03 Sat 16:19]
+** Description
+Search for string
+** Notes
+Sections: .data, .rdata, .rsrc. No unicode support.
+Each string is separated by null byte. Can use fgets() and strstr().
+** DONE Create find_string_addr() function in [[file:e:/Backups/D/Programming/slimdasm/utils.c::129][utils.c]]
+   CLOSED: [2015-01-03 Sat 16:18]
+** DONE Create print_dump_str() function for output
+   CLOSED: [2015-01-03 Sat 16:19]
+
+* TODO Add edit command
+
+* TODO Add command to search for references to address
