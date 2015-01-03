@@ -11,5 +11,6 @@ int valid_addr(DWORD);
 DWORD addr_to_offset(DWORD);
 char *get_instr(DWORD);
 DWORD parse_addr(char *);
+DWORD find_string_addr(char *);
 
 #endif

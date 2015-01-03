@@ -126,3 +126,60 @@ DWORD parse_addr(char *instr) {
 		return 0;	// Mismatch
 	}
 }
+
+/* Return address of first occurrence of string by searching in sections: .data, .rdata, and .rsrc */
+/* No unicode support */
+DWORD find_string_addr(char *matchstr) {
+	DWORD fpos = ftell(fin);	// Get current file position
+	DWORD addr = 0;	// Address of string (0 = string not found)
+	SECTSTRUCT *sect = (SECTSTRUCT *) malloc(sizeof(SECTSTRUCT));
+	char readstr[STRLEN_MAX];
+	DWORD cur_offset;
+
+	/* Remove trailing newline and carriage return */
+	char *cpos;
+	if ((cpos = strchr(matchstr, '\n')) != NULL) {
+		*cpos = '\0';
+	}
+	if ((cpos = strchr(matchstr, '\r')) != NULL) {
+		*cpos = '\0';
+	}
+
+	readstr[0] = '\0';	// Start with empty string
+
+	/* Loop through sections */
+	int match_found = 0;
+	int i;
+	for (i = 0; i < pe->numsects && !match_found; i++) {
+		parse_section(sect, i);
+		/* Only search in .data, .rdata, and .rsrc */
+		if ((strcmp(sect->name, ".data") == 0) || (strcmp(sect->name, ".rdata") == 0) || (strcmp(sect->name, ".rsrc") == 0)) {
+			cur_offset = sect->offset;
+			fseek(fin, cur_offset, SEEK_SET);
+			/* Read and compare each string (separated by null bytes) */
+			while (cur_offset < (sect->offset + sect->size - 0x100) && !match_found) {
+				cur_offset = ftell(fin);
+				/* Get string (the way fgets() should work) */
+				char c = fgetc(fin);
+				int k = 0;
+				while(c != '\0' && k < STRLEN_MAX-1) {
+					readstr[k++] = c;
+					c = fgetc(fin);
+				}
+				readstr[k] = '\0';	// Null-terminate string
+				if (strstr(readstr, matchstr)) {	// Check for substring match
+					printf("%.8X\n", ftell(fin));///DEBUG
+					addr = pe->imagebase + sect->va + (cur_offset - sect->offset);	// Convert offset to address
+					match_found = 1;
+				}
+			}
+		}
+	}
+
+	printf("%.8X\n", addr);
+
+	free(sect);
+	fseek(fin, fpos, SEEK_SET); // Restore previous file position
+
+	return addr;
+}

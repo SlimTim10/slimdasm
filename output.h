@@ -12,6 +12,7 @@ void print_help(void);
 int print_instr(DWORD *);
 void print_ninstr(DWORD *, int);
 void print_dump(DWORD, int);
+void print_dump_str(DWORD);
 void usage(char *);
 
 #endif

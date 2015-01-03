@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 			printf("Go to address: ");
 			char getaddr[32];
 			fgets(getaddr, sizeof(getaddr), stdin);	// Get input
-			if (getaddr[0] == 0x0A) { printf("\n"); break; }	// Blank input (cancel instruction)
+			if (getaddr[0] == '\n' || getaddr[0] == '\r') { printf("\n"); break; }	// Blank input (cancel instruction)
 			addr = strtol(getaddr, NULL, 16);	// Parse input address
 			if (!print_instr(&addr)) break;	// Print the first instruction
 			cur_addr = addr;
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
 			printf("Address of instruction to follow: ");
 			char addrstr[32];
 			fgets(addrstr, sizeof(addrstr), stdin);	// Get input
-			if (addrstr[0] == 0x0A) { printf("\n"); break; }	// Blank input (cancel instruction)
+			if (addrstr[0] == '\n' || addrstr[0] == '\r') { printf("\n"); break; }	// Blank input (cancel instruction)
 			addr = strtol(addrstr, NULL, 16);
 			char *instr = get_instr(addr);
 			if (!instr) break;	// Error
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 			printf("Address to dump: ");
 			char addrstr[32];
 			fgets(addrstr, sizeof(addrstr), stdin);	// Get input
-			if (addrstr[0] == 0x0A) { printf("\n"); break; }	// Blank input (cancel instruction)
+			if (addrstr[0] == '\n' || addrstr[0] == '\r') { printf("\n"); break; }	// Blank input (cancel instruction)
 			addr = strtol(addrstr, NULL, 16);
 			if (!valid_addr(addr)) {
 				printf("Address out of bounds\n");
@@ -142,7 +142,18 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 		case 's': {	// Search for a string in .data, .rdata, and .rsrc sections (no unicode support)
-			
+			printf("\r \n");	// Clear line
+			printf("Search for string: ");
+			char searchstr[STRLEN_MAX];
+			fgets(searchstr, sizeof(searchstr), stdin);	// Get input
+			if (searchstr[0] == '\n' || searchstr[0] == '\r') { printf("\n"); break; }	// Blank input (cancel instruction)
+			addr = find_string_addr(searchstr);	// Find address of string
+			if (addr == 0) {
+				printf("String not found\n");
+			} else {
+				print_dump_str(addr);	// Print dump of matched string
+			}
+			printf("\n");	// Formatting
 			break;
 		}
 		case 'h':	// Show help
