@@ -11,5 +11,12 @@ Each string is separated by null byte. Can use fgets() and strstr().
    CLOSED: [2015-01-03 Sat 16:19]
 
 * TODO Add edit command
+** Description
+Edit binary
+** Notes
+Ask for starting address.
+User inputs a series of bytes (with or without space separators).
+Parse input string as bytes, ignoring spaces, keeping track of length.
+Replace those bytes and save to new file (for testing).
 
 * TODO Add command to search for references to address
