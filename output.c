@@ -17,6 +17,7 @@ void print_help(void) {
 	printf("f-Follow instruction\n");
 	printf("d-Dump\n");
 	printf("s-Search for string\n");
+	printf("e-Edit binary\n");
 	printf("h-Show help\n\n");
 }
 
