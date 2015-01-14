@@ -20,6 +20,6 @@ Parse input string as bytes, ignoring spaces, keeping track of length.
 Replace those bytes and save to new file (for testing).
 ** DONE Edit [[file:output.c::11][print_help()]]
    CLOSED: [2015-01-14 Wed 17:06]
-** TODO Start writing [[file:slimdasm.c::158][case]]
+** TODO Write [[file:slimdasm.c::173][case]]
 
 * TODO Add command to search for references to address

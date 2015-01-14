@@ -156,6 +156,23 @@ int main(int argc, char *argv[]) {
 			printf("\n");	// Formatting
 			break;
 		}
+		case 'e': {	// Edit binary
+			printf("\r \n");	// Clear line
+			printf("Starting address for editing: ");
+			char addrstr[32];
+			fgets(addrstr, sizeof(addrstr), stdin);	// Get input
+			if (addrstr[0] == '\n' || addrstr[0] == '\r') { printf("\n"); break; }	// Blank input (cancel instruction)
+			addr = strtol(addrstr, NULL, 16);
+			if (!valid_addr(addr)) {
+				printf("Address out of bounds\n");
+				break;
+			}
+			printf("Input hex bytes: ");
+			char bytestr[STRLEN_MAX];
+			fgets(bytestr, sizeof(bytestr), stdin);	// Get input
+			///TODO
+			break;
+		}
 		case 'h':	// Show help
 		case '?':
 			print_help();
