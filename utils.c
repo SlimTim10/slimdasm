@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "utils.h"
 #include "global.h"
@@ -168,7 +169,6 @@ DWORD find_string_addr(char *matchstr) {
 				}
 				readstr[k] = '\0';	// Null-terminate string
 				if (strstr(readstr, matchstr)) {	// Check for substring match
-					printf("%.8X\n", ftell(fin));///DEBUG
 					addr = pe->imagebase + sect->va + (cur_offset - sect->offset);	// Convert offset to address
 					match_found = 1;
 				}
@@ -176,10 +176,59 @@ DWORD find_string_addr(char *matchstr) {
 		}
 	}
 
-	printf("%.8X\n", addr);
-
 	free(sect);
 	fseek(fin, fpos, SEEK_SET); // Restore previous file position
 
 	return addr;
+}
+
+void save_edits_to_file(FILE *fin, char *fbakname, DWORD editaddr, char *bytestr) {
+	DWORD fpos = ftell(fin);	// Get current file position
+
+	FILE *fbak;
+
+	/* Create and open backup file for writing */
+	if ((fbak = fopen(fbakname, "wb")) == 0) {
+		fprintf(stderr, "Error: could not create backup file\n");
+		exit(1);
+	}
+
+	/* Parse string of bytes into array of bytes */
+	BYTE edit[STRLEN_MAX / 2];
+	char b[3];	// Hold each byte as string for parsing
+	b[2] = '\0';	// Null-terminate string
+	int len = 0;
+	while (*bytestr != '\0') {
+		/* Get first digit */
+		while (!isxdigit(*bytestr) && *bytestr != '\0') {
+			*bytestr++;
+		}
+		if (*bytestr == '\0') break;
+		b[0] = *bytestr++;
+		/* Get second digit */
+		while (!isxdigit(*bytestr) && *bytestr != '\0') {
+			*bytestr++;
+		}
+		if (*bytestr == '\0') break;
+		b[1] = *bytestr++;
+		edit[len++] = (BYTE) strtol(b, (char **) NULL, 16);	// Parse and store byte
+	}
+
+	DWORD editoffset = addr_to_offset(editaddr);
+	char buf[FILE_BUFSIZE];
+
+	/* Copy whole file to backup file */
+	fseek(fin, 0, SEEK_SET);
+	while (!feof(fin)) {
+		size_t nread = fread(buf, sizeof(char), sizeof(buf), fin);
+		fwrite(buf, sizeof(char), nread, fbak);
+	}
+
+	/* Edit bytes */
+	fseek(fbak, editoffset, SEEK_SET);
+	fwrite(edit, sizeof(BYTE), len, fbak);
+
+	fclose(fbak);
+
+	fseek(fin, fpos, SEEK_SET); // Restore previous file position
 }

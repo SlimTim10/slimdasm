@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "global.h"
 #include "defs.h"
@@ -154,6 +155,28 @@ int main(int argc, char *argv[]) {
 				print_dump_str(addr);	// Print dump of matched string
 			}
 			printf("\n");	// Formatting
+			break;
+		}
+		case 'e': {	// Edit binary
+			printf("\r \n");	// Clear line
+			printf("Starting address for editing: ");
+			char addrstr[32];
+			fgets(addrstr, sizeof(addrstr), stdin);	// Get input
+			if (addrstr[0] == '\n' || addrstr[0] == '\r') { printf("\n"); break; }	// Blank input (cancel instruction)
+			addr = strtol(addrstr, NULL, 16);
+			if (!valid_addr(addr)) {
+				printf("Address out of bounds\n");
+				break;
+			}
+			printf("Input hex bytes: ");
+			char bytestr[STRLEN_MAX];
+			fgets(bytestr, sizeof(bytestr), stdin);	// Get input
+			char *edit_file = (char *) calloc(strlen(argv[1]) + 6, sizeof(char));
+			strncpy(edit_file, argv[1], strlen(argv[1]) - 4);
+			strcat(edit_file, "_edit.exe");	// Edited file name: inputfilename_edit.exe
+			save_edits_to_file(fin, edit_file, addr, bytestr);
+			printf("Edited file %s saved\n\n", edit_file);
+			free(edit_file);
 			break;
 		}
 		case 'h':	// Show help
