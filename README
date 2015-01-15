@@ -13,4 +13,7 @@ n-Next instruction      space-Next 32 instructions
 o-Go to OEP
 g-Go to address
 f-Follow instruction
+d-Dump
+s-Search for string
+e-Edit binary
 h-Show help
