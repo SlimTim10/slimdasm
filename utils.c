@@ -182,7 +182,7 @@ DWORD find_string_addr(char *matchstr) {
 	return addr;
 }
 
-void save_edits_to_file(FILE *fin, char *fbakname, DWORD startaddr, char *bytestr) {
+void save_edits_to_file(FILE *fin, char *fbakname, DWORD editaddr, char *bytestr) {
 	DWORD fpos = ftell(fin);	// Get current file position
 
 	FILE *fbak;
@@ -192,8 +192,6 @@ void save_edits_to_file(FILE *fin, char *fbakname, DWORD startaddr, char *bytest
 		fprintf(stderr, "Error: could not create backup file\n");
 		exit(1);
 	}
-
-	DWORD startoffset = addr_to_offset(startaddr);
 
 	/* Parse string of bytes into array of bytes */
 	BYTE edit[STRLEN_MAX / 2];
@@ -216,13 +214,19 @@ void save_edits_to_file(FILE *fin, char *fbakname, DWORD startaddr, char *bytest
 		edit[len++] = (BYTE) strtol(b, (char **) NULL, 16);	// Parse and store byte
 	}
 
-	/* Copy file to backup file in blocks */
+	DWORD editoffset = addr_to_offset(editaddr);
 	char buf[FILE_BUFSIZE];
-	fseek(fin, 0, SEEK_SET);	// Start at beginning of file
+
+	/* Copy whole file to backup file */
+	fseek(fin, 0, SEEK_SET);
 	while (!feof(fin)) {
 		size_t nread = fread(buf, sizeof(char), sizeof(buf), fin);
 		fwrite(buf, sizeof(char), nread, fbak);
 	}
+
+	/* Edit bytes */
+	fseek(fbak, editoffset, SEEK_SET);
+	fwrite(edit, sizeof(BYTE), len, fbak);
 
 	fclose(fbak);
 
