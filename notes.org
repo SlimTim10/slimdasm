@@ -21,5 +21,6 @@ Replace those bytes and save to new file (for testing).
 ** DONE Edit [[file:output.c::11][print_help()]]
    CLOSED: [2015-01-14 Wed 17:06]
 ** TODO Write [[file:slimdasm.c::173][case]]
+** TODO Create function to duplicate file before (precursor to save edited file)
 
 * TODO Add command to search for references to address
