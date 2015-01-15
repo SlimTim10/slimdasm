@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "global.h"
 #include "defs.h"
@@ -171,6 +172,11 @@ int main(int argc, char *argv[]) {
 			char bytestr[STRLEN_MAX];
 			fgets(bytestr, sizeof(bytestr), stdin);	// Get input
 			///TODO
+			char *backup_file = (char *) malloc((sizeof(argv[1]) * sizeof(char)) + 5);
+			backup_file = strcat(argv[1], ".bak");
+			save_backup_file(fin, backup_file);
+			printf("Backup file %s saved\n\n", backup_file);
+			free(backup_file);
 			break;
 		}
 		case 'h':	// Show help

@@ -168,7 +168,6 @@ DWORD find_string_addr(char *matchstr) {
 				}
 				readstr[k] = '\0';	// Null-terminate string
 				if (strstr(readstr, matchstr)) {	// Check for substring match
-					printf("%.8X\n", ftell(fin));///DEBUG
 					addr = pe->imagebase + sect->va + (cur_offset - sect->offset);	// Convert offset to address
 					match_found = 1;
 				}
@@ -176,10 +175,32 @@ DWORD find_string_addr(char *matchstr) {
 		}
 	}
 
-	printf("%.8X\n", addr);
-
 	free(sect);
 	fseek(fin, fpos, SEEK_SET); // Restore previous file position
 
 	return addr;
+}
+
+void save_backup_file(FILE *fin, char *fbakname) {
+	DWORD fpos = ftell(fin);	// Get current file position
+
+	FILE *fbak;
+
+	/* Create and open backup file for writing */
+	if ((fbak = fopen(fbakname, "wb")) == 0) {
+		fprintf(stderr, "Error: could not create backup file\n");
+		exit(1);
+	}
+
+	/* Copy file to backup file in blocks */
+	char buf[FILE_BUFSIZE];
+	fseek(fin, 0, SEEK_SET);	// Start at beginning of file
+	while (!feof(fin)) {
+		size_t nread = fread(buf, sizeof(char), sizeof(buf), fin);
+		fwrite(buf, sizeof(char), nread, fbak);
+	}
+
+	fclose(fbak);
+
+	fseek(fin, fpos, SEEK_SET); // Restore previous file position
 }

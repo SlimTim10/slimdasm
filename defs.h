@@ -13,6 +13,7 @@ typedef uint32_t DWORD;
 enum constants {
 	DUMP_MAX = 512,
 	STRLEN_MAX = 256,
+	FILE_BUFSIZE = 2048,
 };
 
 #endif
