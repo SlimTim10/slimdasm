@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "utils.h"
 #include "global.h"
@@ -181,7 +182,7 @@ DWORD find_string_addr(char *matchstr) {
 	return addr;
 }
 
-void save_backup_file(FILE *fin, char *fbakname) {
+void save_edits_to_file(FILE *fin, char *fbakname, DWORD startaddr, char *bytestr) {
 	DWORD fpos = ftell(fin);	// Get current file position
 
 	FILE *fbak;
@@ -190,6 +191,29 @@ void save_backup_file(FILE *fin, char *fbakname) {
 	if ((fbak = fopen(fbakname, "wb")) == 0) {
 		fprintf(stderr, "Error: could not create backup file\n");
 		exit(1);
+	}
+
+	DWORD startoffset = addr_to_offset(startaddr);
+
+	/* Parse string of bytes into array of bytes */
+	BYTE edit[STRLEN_MAX / 2];
+	char b[3];	// Hold each byte as string for parsing
+	b[2] = '\0';	// Null-terminate string
+	int len = 0;
+	while (*bytestr != '\0') {
+		/* Get first digit */
+		while (!isxdigit(*bytestr) && *bytestr != '\0') {
+			*bytestr++;
+		}
+		if (*bytestr == '\0') break;
+		b[0] = *bytestr++;
+		/* Get second digit */
+		while (!isxdigit(*bytestr) && *bytestr != '\0') {
+			*bytestr++;
+		}
+		if (*bytestr == '\0') break;
+		b[1] = *bytestr++;
+		edit[len++] = (BYTE) strtol(b, (char **) NULL, 16);	// Parse and store byte
 	}
 
 	/* Copy file to backup file in blocks */

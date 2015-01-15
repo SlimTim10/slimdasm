@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
 			///TODO
 			char *backup_file = (char *) malloc((sizeof(argv[1]) * sizeof(char)) + 5);
 			backup_file = strcat(argv[1], ".bak");
-			save_backup_file(fin, backup_file);
+			save_edits_to_file(fin, backup_file, addr, bytestr);
 			printf("Backup file %s saved\n\n", backup_file);
 			free(backup_file);
 			break;

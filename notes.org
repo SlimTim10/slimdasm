@@ -22,10 +22,12 @@ Replace those bytes and save to new file (for testing).
    CLOSED: [2015-01-14 Wed 17:06]
 ** DONE Write [[file:slimdasm.c::173][case]]
    CLOSED: [2015-01-14 Wed 22:14]
-** DONE Create function to duplicate file before (precursor to save edited file)
+** DONE Create function to duplicate file (precursor to save edited file)
    CLOSED: [2015-01-14 Wed 21:58]
 ** TODO Change [[file:utils.c::void%20save_backup_file(FILE%20*fin,%20char%20*fbakname)%20{][save_backup_file()]] to save_edits_to_file() and include edits
-*** TODO Parse edit string as bytes (ignoring spaces, only allow proper characters)
-*** TODO Function arguments: file pointer, file name, offset to start edit, byte edit string
+*** DONE Parse edit string as bytes (ignoring spaces, only allow proper characters)
+	 CLOSED: [2015-01-15 Thu 10:02]
+*** DONE Function arguments: file pointer, file name, offset to start edit, byte edit string
+	 CLOSED: [2015-01-15 Thu 08:18]
 
 * TODO Add command to search for references to address
